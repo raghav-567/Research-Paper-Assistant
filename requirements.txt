@@ -1,0 +1,12 @@
+arxiv
+requests
+tqdm
+sentence-transformers
+faiss-cpu
+numpy
+pandas
+pypdf
+scikit-learn
+streamlit
+fastapi
+uvicorn
