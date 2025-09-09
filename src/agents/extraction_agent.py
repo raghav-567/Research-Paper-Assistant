@@ -6,7 +6,7 @@ logger = get_logger("ExtractionAgent")
 
 class ExtractionAgent:
     def parse_pdf(self, pdf_path, paper_id=None):
-        """Extract full text from a PDF, clean it, and return as chunks"""
+        """Extract abstract + body from PDF, clean, and return chunks"""
         logger.info(f"Extracting text from PDF: {pdf_path}")
         doc = fitz.open(pdf_path)
 
@@ -14,60 +14,57 @@ class ExtractionAgent:
         for page in doc:
             raw = page.get_text("text")
             cleaned = self.clean_text(raw)
-            if cleaned:  # skip empty/noisy pages
+            if cleaned:
                 text.append(cleaned)
 
         full_text = " ".join(text)
 
-        # Return as chunks
-        return self.chunk_text(full_text, paper_id=paper_id)
+        # --- NEW: extract abstract separately ---
+        abstract = self.extract_abstract(full_text)
+
+        # Fallback: if no abstract found, use first ~600 words
+        if not abstract:
+            logger.warning(f"No explicit abstract found in {pdf_path}, using intro fallback.")
+            abstract = " ".join(full_text.split()[:600])
+
+        # Chunk the body (excluding abstract text if found)
+        body_text = full_text.replace(abstract, "")
+        chunks = self.chunk_text(body_text, paper_id=paper_id)
+
+        return {"abstract": abstract, "chunks": chunks}
 
     @staticmethod
     def clean_text(text: str) -> str:
         """Remove LaTeX, equations, code-like content, citations, references, and noise"""
-        # Math and LaTeX
-        text = re.sub(r"\$.*?\$", " ", text)                
-        text = re.sub(r"\\\[.*?\\\]", " ", text, flags=re.S) 
-        
-        # Inline code
-        text = re.sub(r"`.*?`", " ", text)                  
-        
-        # Braces, angle brackets
-        text = re.sub(r"[{}<>]", " ", text)                 
-        
-        # URLs
-        text = re.sub(r"http\S+", " ", text)                
-        
-        # Citations like [12], [67], (Smith et al., 2020)
-        text = re.sub(r"\[\d+(,\s*\d+)*\]", " ", text)      
+        text = re.sub(r"\$.*?\$", " ", text)
+        text = re.sub(r"\\\[.*?\\\]", " ", text, flags=re.S)
+        text = re.sub(r"`.*?`", " ", text)
+        text = re.sub(r"[{}<>]", " ", text)
+        text = re.sub(r"http\S+", " ", text)
+        text = re.sub(r"\[\d+(,\s*\d+)*\]", " ", text)
         text = re.sub(r"\([A-Z][A-Za-z]+ et al\., \d{4}\)", " ", text)
-        
-        # References/journals like "RSC Adv. 4 (2014), 1120–1127"
         text = re.sub(r"[A-Z][a-zA-Z]+\s+[A-Z][a-zA-Z]+\.\s*\d+\s*\(\d{4}\).*?\d+", " ", text)
-
-        #after refrences 
         text = re.split(r"(?i)references", text)[0]
-
-        
-        # Figure/Table captions
         text = re.sub(r"(Figure|Table)\s*\d+[:\.].*", " ", text)
-        
-        # Collapse extra spaces
-        text = re.sub(r"\s+", " ", text) 
-
-        # Acknowledgment
         text = re.sub(r"(?i)(acknowledg(e)?ments|funding|grants?).*", " ", text)
-                   
+        text = re.sub(r"\s+", " ", text)
         return text.strip()
 
+    @staticmethod
+    def extract_abstract(text: str) -> str:
+        """Try to locate abstract section explicitly"""
+        match = re.search(r"(?i)(abstract)(.*?)(introduction|keywords|1\s)", text, re.S)
+        if match:
+            return match.group(2).strip()
+        return None
 
-    def chunk_text(self, text, paper_id=None, chunk_size=300):
+    def chunk_text(self, text, paper_id=None, chunk_size=2000):
         """Split cleaned text into word-based chunks"""
         words = text.split()
         chunks = []
         for i in range(0, len(words), chunk_size):
             chunk_words = words[i:i + chunk_size]
             chunk = " ".join(chunk_words)
-            if len(chunk_words) >= 30:  # skip tiny/noisy chunks
+            if len(chunk_words) >= 30:
                 chunks.append({"text": chunk, "metadata": {"paper_id": paper_id}})
         return chunks

@@ -1,34 +1,60 @@
 import numpy as np
 from collections import defaultdict
+import faiss   # ✅ make sure FAISS is imported
+
 class RAGPipeline:
-    def __init__(self, search_agent, extraction_agent, summarizer_agent, index, id_to_metadata):
+    def __init__(self, search_agent, extraction_agent, summarizer_agent, index=None, id_to_metadata=None):
         self.search_agent = search_agent
         self.extraction_agent = extraction_agent
         self.summarizer_agent = summarizer_agent
-        self.index = index 
-        self.id_to_metadata = id_to_metadata  # chunk-level
+        self.index = index   # will be initialized on first build_index call
+        self.id_to_metadata = id_to_metadata if id_to_metadata is not None else {}
         self.paper_metadata = {}  # paper-level
 
     def build_index(self, chunks, paper_info=None):
-        texts = [chunk["text"] for chunk in chunks]
+        texts = [chunk["text"] for chunk in chunks if chunk["text"].strip()]
+        if not texts:
+            print("⚠️ No valid text chunks found for embedding.")
+            return
+
         embeddings = self.summarizer_agent.embedding_model.encode(texts, convert_to_numpy=True)
+
+        if embeddings.ndim == 1:
+            embeddings = embeddings.reshape(1, -1)
+
+        if embeddings.size == 0:
+            raise ValueError("❌ No embeddings were generated (empty input text?).")
+
+        d = embeddings.shape[1]
+
+        # ✅ Initialize FAISS if needed
+        if self.index is None:
+            self.index = faiss.IndexFlatL2(d)
+        elif self.index.d != d:
+            raise ValueError(
+                f"Embedding dimension mismatch: Index expects {self.index.d}, but new embeddings have {d}"
+            )
 
         self.index.add(embeddings)
 
         start_idx = len(self.id_to_metadata)
         for i, chunk in enumerate(chunks):
+            if not chunk["text"].strip():  # skip empty chunks
+                continue
             self.id_to_metadata[start_idx + i] = {
                 "text": chunk["text"],
                 "paper_id": chunk["metadata"]["paper_id"]
             }
 
-        # Store paper-level metadata if provided
         if paper_info:
             self.paper_metadata[paper_info["id"]] = paper_info
 
-    def query(self, query, top_k_chunks=200, top_k_papers=3, chunks_per_paper=3):
+    def query(self, query, top_k_chunks=200, top_k_papers=3, chunks_per_paper=10):
         query_emb = self.summarizer_agent.embedding_model.encode([query], convert_to_numpy=True)
-        D, I = self.index.search(query_emb, top_k_chunks) 
+        if query_emb.ndim == 1:
+            query_emb = query_emb.reshape(1, -1)
+
+        D, I = self.index.search(query_emb, top_k_chunks)
         results = [(i, float(D[0][rank])) for rank, i in enumerate(I[0])]
 
         paper_scores = defaultdict(list)
@@ -36,7 +62,7 @@ class RAGPipeline:
 
         for idx, score in results:
             if idx == -1:
-                continue 
+                continue
             chunk_info = self.id_to_metadata[idx]
             paper_id = chunk_info["paper_id"]
             text_chunk = chunk_info["text"]
@@ -58,7 +84,7 @@ class RAGPipeline:
             combined_text = " ".join(top_chunks)
 
             summary = self.summarizer_agent.summarizer(
-                combined_text[:1000],
+                combined_text[:1500],
                 max_length=150,
                 min_length=60,
                 do_sample=False

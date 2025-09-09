@@ -11,7 +11,7 @@ class SearchAgent:
         self.pdf_dir = Path(pdf_dir)
         self.pdf_dir.mkdir(parents=True, exist_ok=True)
 
-    def search_arxiv(self, query, max_results=10):
+    def search_arxiv(self, query, max_results=3):
         logger.info(f"Searching Arxiv for: {query}")
         results = arxiv.Search(
             query=query, 
