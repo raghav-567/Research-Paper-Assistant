@@ -26,14 +26,9 @@ class SummarizerAgent:
         return [chunks[i] for i in top_k_idx]
 
     def summarize_chunks(self, paper_data, query=None, k=10):
-        """
-        Summarize a paper given its abstract + chunks.
-        - Always prioritize the abstract.
-        - Optionally augment with top-k body chunks.
-        """
         logger.info("Summarizing retrieved chunks")
 
-        # Handle both old (list) and new (dict with abstract+chunks) input
+        # Handle abstract+chunks input
         abstract = None
         chunks = []
 
@@ -46,7 +41,7 @@ class SummarizerAgent:
         if not chunks and not abstract:
             return "No content available."
 
-        # --- Step 1: Summarize abstract if present ---
+        # Step 1: Summarize abstract if present 
         abs_summary = ""
         if abstract:
             abs_summary = self.summarizer(
@@ -56,7 +51,7 @@ class SummarizerAgent:
                 do_sample=False
             )[0]["summary_text"]
 
-        # --- Step 2: Select top-k body chunks ---
+        # Step 2: Select top-k body chunks 
         body_summary = ""
         if chunks:
             if query:
@@ -84,7 +79,7 @@ class SummarizerAgent:
                 do_sample=False
             )[0]["summary_text"]
 
-        # --- Step 3: Merge ---
+        #  Step 3: Merge 
         if abs_summary and body_summary:
             return f"{abs_summary} {body_summary}"
         return abs_summary or body_summary
