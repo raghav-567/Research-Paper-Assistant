@@ -1,4 +1,4 @@
-import fitz  # PyMuPDF
+import fitz  
 import re
 from src.utils import get_logger
 
@@ -19,10 +19,10 @@ class ExtractionAgent:
 
         full_text = " ".join(text)
 
-        # --- NEW: extract abstract separately ---
+        # extracting abstract separately
         abstract = self.extract_abstract(full_text)
 
-        # Fallback: if no abstract found, use first ~600 words
+        # if no abstract found, use first ~600 words
         if not abstract:
             logger.warning(f"No explicit abstract found in {pdf_path}, using intro fallback.")
             abstract = " ".join(full_text.split()[:600])
@@ -35,7 +35,17 @@ class ExtractionAgent:
 
     @staticmethod
     def clean_text(text: str) -> str:
-        """Remove LaTeX, equations, code-like content, citations, references, and noise"""
+        text = re.sub(
+            r"(?:[A-Z][a-z]+(?:\s[A-Z][a-z]+)*[\*,\d¹²³⁴⁵⁶⁷⁸⁹†]*\s*,\s*){2,}.*",
+            " ",
+            text,
+        )
+        text = re.sub(
+            r"^\s*[¹²³⁴⁵⁶⁷⁸⁹]\s?.*(University|Institute|Academy|School|Department).*",
+            " ",
+            text,
+            flags=re.M | re.I,
+        )
         text = re.sub(r"\$.*?\$", " ", text)
         text = re.sub(r"\\\[.*?\\\]", " ", text, flags=re.S)
         text = re.sub(r"`.*?`", " ", text)
@@ -47,19 +57,20 @@ class ExtractionAgent:
         text = re.split(r"(?i)references", text)[0]
         text = re.sub(r"(Figure|Table)\s*\d+[:\.].*", " ", text)
         text = re.sub(r"(?i)(acknowledg(e)?ments|funding|grants?).*", " ", text)
+
         text = re.sub(r"\s+", " ", text)
         return text.strip()
 
     @staticmethod
     def extract_abstract(text: str) -> str:
-        """Try to locate abstract section explicitly"""
+        # Retrieving abstract section explicitly
         match = re.search(r"(?i)(abstract)(.*?)(introduction|keywords|1\s)", text, re.S)
         if match:
             return match.group(2).strip()
         return None
 
     def chunk_text(self, text, paper_id=None, chunk_size=2000):
-        """Split cleaned text into word-based chunks"""
+        # Spliting cleaned text into word-based chunks
         words = text.split()
         chunks = []
         for i in range(0, len(words), chunk_size):
