@@ -1,15 +1,15 @@
 import numpy as np
 from collections import defaultdict
-import faiss   # ✅ make sure FAISS is imported
+import faiss 
 
 class RAGPipeline:
     def __init__(self, search_agent, extraction_agent, summarizer_agent, index=None, id_to_metadata=None):
         self.search_agent = search_agent
         self.extraction_agent = extraction_agent
         self.summarizer_agent = summarizer_agent
-        self.index = index   # will be initialized on first build_index call
+        self.index = index   
         self.id_to_metadata = id_to_metadata if id_to_metadata is not None else {}
-        self.paper_metadata = {}  # paper-level
+        self.paper_metadata = {} 
 
     def build_index(self, chunks, paper_info=None):
         texts = [chunk["text"] for chunk in chunks if chunk["text"].strip()]
@@ -27,7 +27,6 @@ class RAGPipeline:
 
         d = embeddings.shape[1]
 
-        # ✅ Initialize FAISS if needed
         if self.index is None:
             self.index = faiss.IndexFlatL2(d)
         elif self.index.d != d:
@@ -39,7 +38,7 @@ class RAGPipeline:
 
         start_idx = len(self.id_to_metadata)
         for i, chunk in enumerate(chunks):
-            if not chunk["text"].strip():  # skip empty chunks
+            if not chunk["text"].strip():  # skiped empty chunks
                 continue
             self.id_to_metadata[start_idx + i] = {
                 "text": chunk["text"],
