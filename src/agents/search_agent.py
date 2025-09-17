@@ -31,7 +31,7 @@ class SearchAgent:
                 "title": r.title,
                 "summary": r.summary,
                 "authors": [a.name for a in r.authors],
-                "pdf_path": pdf_path,  # path to downloaded PDF, or None
+                "pdf_path": pdf_path,  # path(url) to downloaded PDF, else None
                 "url": r.entry_id,
                 "published": r.published
             })
