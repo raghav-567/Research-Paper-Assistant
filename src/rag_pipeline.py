@@ -1,15 +1,15 @@
 import numpy as np
 from collections import defaultdict
-import faiss 
+import faiss
 
 class RAGPipeline:
     def __init__(self, search_agent, extraction_agent, summarizer_agent, index=None, id_to_metadata=None):
         self.search_agent = search_agent
         self.extraction_agent = extraction_agent
         self.summarizer_agent = summarizer_agent
-        self.index = index   
+        self.index = index
         self.id_to_metadata = id_to_metadata if id_to_metadata is not None else {}
-        self.paper_metadata = {} 
+        self.paper_metadata = {}
 
     def build_index(self, chunks, paper_info=None):
         texts = [chunk["text"] for chunk in chunks if chunk["text"].strip()]
@@ -38,7 +38,7 @@ class RAGPipeline:
 
         start_idx = len(self.id_to_metadata)
         for i, chunk in enumerate(chunks):
-            if not chunk["text"].strip():  # skiped empty chunks
+            if not chunk["text"].strip():
                 continue
             self.id_to_metadata[start_idx + i] = {
                 "text": chunk["text"],
@@ -82,12 +82,10 @@ class RAGPipeline:
             top_chunks = [chunk for _, chunk in sorted_chunks[:chunks_per_paper]]
             combined_text = " ".join(top_chunks)
 
-            summary = self.summarizer_agent.summarizer(
-                combined_text[:1500],
-                max_length=150,
-                min_length=60,
-                do_sample=False
-            )[0]['summary_text']
+            summary = self.summarizer_agent._summarize_text(
+                combined_text[:3000],
+                max_output_tokens=200
+            )
 
             paper_info = self.paper_metadata.get(
                 paper_id,
