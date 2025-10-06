@@ -13,7 +13,7 @@ def run(query):
     # 1. Initialize agents
     search = SearchAgent(pdf_dir="pdfs")
     extraction = ExtractionAgent()
-    summarizer = SummarizerAgent()
+    summarizer = SummarizerAgent(api_key="AIzaSyBeLf_qcAilC-_Ljqk5Pqd9R86cmsesmZ8")
     synthesizer = SynthesizerAgent()
 
     # 2. Initialize FAISS + metadata store
@@ -78,4 +78,4 @@ def run(query):
     logger.info(f"Literature review saved in {output_file}")
 
 if __name__ == "__main__":
-    run("Ensemble models")
+    run("Machine learning")
