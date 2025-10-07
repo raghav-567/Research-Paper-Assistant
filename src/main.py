@@ -7,14 +7,18 @@ from src.utils import get_logger
 import faiss
 import os
 import time
+from dotenv import load_dotenv
 
 logger = get_logger("Main")
+load_dotenv()
+
+api_key = os.getenv("API_KEY")
 
 def run(query):
     # 1. Initialize agents
     search = SearchAgent(pdf_dir="pdfs")
     extraction = ExtractionAgent()
-    summarizer = SummarizerAgent(api_key="AIzaSyBeLf_qcAilC-_Ljqk5Pqd9R86cmsesmZ8")
+    summarizer = SummarizerAgent(api_key)
     synthesizer = SynthesizerAgent()
 
     # 2. Initialize FAISS + metadata store
