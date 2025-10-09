@@ -366,7 +366,7 @@ if st.session_state.review:
     st.markdown("### 📝 Generated Literature Review")
     st.markdown(st.session_state.review)
     st.download_button(
-        "📥 Download Markdown",
+        "📥 Download",
         st.session_state.review,
         file_name=f"review_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
         mime="text/markdown"
