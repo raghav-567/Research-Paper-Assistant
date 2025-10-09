@@ -10,3 +10,5 @@ scikit-learn
 streamlit
 fastapi
 uvicorn
+google-generativeai
+PyMuPDF

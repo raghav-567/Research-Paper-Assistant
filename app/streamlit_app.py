@@ -101,22 +101,20 @@ st.markdown("""
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        background: rgba(34, 197, 94, 0.1);
-        color: #22c55e;
         padding: 0.5rem 1rem;
         border-radius: 20px;
         font-size: 0.8rem;
         font-weight: 600;
-        border: 1px solid rgba(34, 197, 94, 0.2);
+        border: 1px solid transparent;
     }
+    .status-badge.ok { background: rgba(34, 197, 94, 0.1); color: #22c55e; border-color: rgba(34, 197, 94, 0.2); }
+    .status-badge.warn { background: rgba(245, 158, 11, 0.1); color: #ca8a04; border-color: rgba(245, 158, 11, 0.2); }
+    .status-badge.error { background: rgba(239, 68, 68, 0.1); color: #dc2626; border-color: rgba(239, 68, 68, 0.2); }
     
-    .status-dot {
-        width: 8px;
-        height: 8px;
-        background: #22c55e;
-        border-radius: 50%;
-        animation: pulse 2s infinite;
-    }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; animation: pulse 2s infinite; }
+    .status-dot.ok { background: #22c55e; }
+    .status-dot.warn { background: #f59e0b; }
+    .status-dot.error { background: #ef4444; }
     
     /* Main Content */
     .main-header {
@@ -272,25 +270,31 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Fixed Header using HTML ---
-st.markdown("""
+# Build dynamic status badge
+_processing = st.session_state.get("processing", False)
+if api_key and not _processing:
+    _status_cls, _status_text = "ok", "Online"
+elif _processing:
+    _status_cls, _status_text = "warn", "Processing..."
+else:
+    _status_cls, _status_text = "error", "No API key"
+
+_header_html = f"""
 <div class="header-container">
-    <div class="header-logo">
-        🔬 Research Assistant
-    </div>
-    
+    <div class="header-logo">🔬 Research Assistant</div>
     <div class="header-nav">
         <div class="nav-item active">Dashboard</div>
         <div class="nav-item">History</div>
         <div class="nav-item">Settings</div>
         <div class="nav-item">Help</div>
     </div>
-    
-    <div class="status-badge">
-        <div class="status-dot"></div>
-        Online
+    <div class="status-badge {_status_cls}">
+        <div class="status-dot {_status_cls}"></div>
+        {_status_text}
     </div>
 </div>
-""", unsafe_allow_html=True)
+"""
+st.markdown(_header_html, unsafe_allow_html=True)
 
 # --- Main Content ---
 st.markdown('<h1 class="main-header">🔬 Agentic Research Assistant</h1>', unsafe_allow_html=True)
@@ -315,14 +319,25 @@ if "review" not in st.session_state:
 if "processing" not in st.session_state:
     st.session_state.processing = False
 
-# --- Input Section ---
-query = st.text_input("Enter your research query", placeholder="e.g. Deep learning for time series forecasting")
+# --- Input Section (centered) ---
+_in_col1, _in_col2, _in_col3 = st.columns([1, 2, 1])
+with _in_col2:
+    query = st.text_input(
+        "Enter your research query",
+        placeholder="e.g. Deep learning for time series forecasting",
+        key="query",
+    )
+    if not api_key:
+        st.warning("No API key configured. Set `GEMINI_API_KEY` in .env or Streamlit secrets.")
+    else:
+        st.caption("API key detected.")
 
 # --- Centered Button ---
-col1, col2, col3 = st.columns([1, 2, 1])
-
-with col2:
+_btn_col1, _btn_col2, _btn_col3 = st.columns([1, 2, 1])
+with _btn_col2:
     generate = st.button("🚀 Generate Literature Review", disabled=not api_key or not query)
+    if st.session_state.get("processing"):
+        st.info("⏳ Generating literature review... This may take a minute.")
 
 # --- Generation Logic ---
 if generate and query:
@@ -381,10 +396,21 @@ if st.session_state.review:
     st.markdown('<div class="response-card">', unsafe_allow_html=True)
     st.markdown("### 📝 Generated Literature Review")
     st.markdown(st.session_state.review)
-    st.download_button(
-        "📥 Download Markdown",
-        st.session_state.review,
-        file_name=f"review_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
-        mime="text/markdown"
-    )
+    dl_col, clr_col = st.columns([3, 1])
+    with dl_col:
+        st.download_button(
+            "📥 Download Markdown",
+            st.session_state.review,
+            file_name=f"review_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
+            mime="text/markdown"
+        )
+    with clr_col:
+        if st.button("🧹 Clear"):
+            st.session_state.review = None
+            st.session_state.processing = False
+            try:
+                st.session_state.query = ""
+            except Exception:
+                pass
+            st.experimental_rerun()
     st.markdown("</div>", unsafe_allow_html=True)
