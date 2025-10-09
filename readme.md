@@ -790,7 +790,7 @@ This project is licensed under the MIT License - see below for details.
 ```
 MIT License
 
-Copyright (c) 2024 [Your Name]
+Copyright (c) 2024 [Raghav Agarwal]
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -827,8 +827,8 @@ SOFTWARE.
 
 For questions, suggestions, or collaboration:
 
-- **Email**: your.email@example.com
-- **GitHub**: [@yourusername](https://github.com/yourusername)
+- **Email**: agarwal1996raghav@gmail.com
+- **GitHub**: [@raghav-567](https://github.com/raghav-567)
 - **Issues**: [Report a bug](https://github.com/yourusername/agentic-research-assistant/issues)
 - **Discussions**: [Start a discussion](https://github.com/yourusername/agentic-research-assistant/discussions)
 
@@ -876,24 +876,3 @@ Typical performance metrics:
 *Note: Times vary based on paper length and network speed*
 
 ---
-
-## ⭐ Star History
-
-If you find this project useful, please consider giving it a star!
-
-[![Star History](https://api.star-history.com/svg?repos=yourusername/agentic-research-assistant&type=Date)](https://star-history.com/#yourusername/agentic-research-assistant&Date)
-
----
-
-## 📈 Project Stats
-
-![GitHub repo size](https://img.shields.io/github/repo-size/yourusername/agentic-research-assistant)
-![GitHub contributors](https://img.shields.io/github/contributors/yourusername/agentic-research-assistant)
-![GitHub stars](https://img.shields.io/github/stars/yourusername/agentic-research-assistant?style=social)
-![GitHub forks](https://img.shields.io/github/forks/yourusername/agentic-research-assistant?style=social)
-
----
-
-**Built with ❤️ for researchers, by researchers**
-
-*Making literature reviews accessible to everyone*
