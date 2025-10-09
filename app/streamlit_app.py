@@ -3,17 +3,19 @@ import os
 import sys
 from pathlib import Path
 from datetime import datetime
-from dotenv import load_dotenv
 import time
-import faiss
+
+# Make python-dotenv optional (no-op if unavailable)
+try:
+    from dotenv import load_dotenv  # type: ignore
+except Exception:  # pragma: no cover - optional dependency
+    def load_dotenv():  # type: ignore
+        return False
 
 sys.path.append(str(Path(__file__).parent.parent))
 
 from src.agents.search_agent import SearchAgent
-from src.agents.extraction_agent import ExtractionAgent
-from src.agents.summarizer_agent import SummarizerAgent
 from src.agents.synthesizer_agent import SynthesizerAgent
-from src.rag_pipeline import RAGPipeline
 
 # --- Page Config ---
 st.set_page_config(
@@ -296,7 +298,17 @@ st.markdown('<p class="tagline">Your Intelligent Literature Companion</p>', unsa
 
 # --- Load Env and Initialize ---
 load_dotenv()
-api_key = os.getenv("API_KEY")
+# Prefer GEMINI_API_KEY, fallback to API_KEY and Streamlit secrets
+_secrets_key = None
+try:
+    _secrets_key = st.secrets["GEMINI_API_KEY"]
+except Exception:
+    try:
+        _secrets_key = st.secrets["API_KEY"]
+    except Exception:
+        _secrets_key = None
+
+api_key = os.getenv("GEMINI_API_KEY") or os.getenv("API_KEY") or _secrets_key
 
 if "review" not in st.session_state:
     st.session_state.review = None
@@ -323,13 +335,17 @@ if generate and query:
         status.text("🔧 Initializing...")
 
         search = SearchAgent(pdf_dir="pdfs")
-        extraction = ExtractionAgent()
+        # Lazy import to avoid hard dependency at app startup
+        try:
+            from src.agents.summarizer_agent import SummarizerAgent  # noqa: WPS433
+        except Exception as import_err:
+            st.error(
+                "Missing dependency for summarization. Install 'google-generativeai' and 'sentence-transformers'.\n"
+                f"Import error: {import_err}"
+            )
+            raise
         summarizer = SummarizerAgent(api_key=api_key)
         synthesizer = SynthesizerAgent()
-
-        dim = summarizer.embedding_model.get_sentence_embedding_dimension()
-        index = faiss.IndexFlatL2(dim)
-        rag = RAGPipeline(search, extraction, summarizer, index, {})
 
         progress.progress(10)
         status.text(f"🔍 Searching arXiv for '{query}'")
