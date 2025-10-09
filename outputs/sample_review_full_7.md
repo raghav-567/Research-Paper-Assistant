@@ -1,17 +1,29 @@
 # Literature Review
 
-## 1. Ensemble of Deep Convolutional Neural Networks for real-time gravitational wave signal recognition
-**Authors**: CunLiang Ma, Wei Wang, He Wang, Zhoujian Cao
+## 1. Lecture Notes: Optimization for Machine Learning
+**Authors**: Elad Hazan
 
-**Summary**: X.-R. Li, W.-L. Yu, and G. J. Babu, Frontiers of physics 15, 1 (2020), and Y. Zhong and J. Cao, SCIENCE CHINA Physics, Mechanics & Astronomy 62, 1 (2019) . S. Sachdev, S. Caudill, H. Fong, R. K. Lo, C. Messick, K. Blackburn, P. Brady, et al.,
+**Summary**: These lecture notes by Elad Hazan cover optimization techniques for machine learning. Key topics include:
 
-## 2. Moment based methods for ensemble assessment and calibration
-**Authors**: Stephen Jewson
+*   **Introduction to Optimization Problems:** Discusses examples like Empirical Risk Minimization, Matrix Completion, and Learning in Linear Dynamical Systems. It also addresses the computational hardness of mathematical programming.
+*   **Basic Concepts:** Covers convexity, projections onto convex sets, optimality conditions, and solution concepts for non-convex optimization.
+*   **Gradient Descent:** Explores gradient descent with Polyak stepsize.
+*   **Stochastic Gradient Descent (SGD):** Focuses on SGD and its application to training feedforward neural networks.
+*   **Generalization and Non-Smooth Optimization:** Discusses minimizing regret, its implication for generalization, and
 
-**Summary**: the results themselves show that the calibrated probabilistic forecasts contain useful predictability up to lead six . the results for the regression model are vs. climatology out of sample . however, the spread-regression model maintains its (albeit small) advantage .
+Unable to generate summary after 3 attempts.
 
-## 3. Exploring Model Learning Heterogeneity for Boosting Ensemble Robustness
-**Authors**: Yanzhao Wu, Ka-Ho Chow, Wenqi Wei, Ling Liu
+## 2. An Optimal Control View of Adversarial Machine Learning
+**Authors**: Xiaojin Zhu
 
-**Summary**: tier-1 heterogeneous ensemble consensus method by weighted algorithms for combining bounding boxes and integrating classification confidence for each detected object . we introduce a connected component labeling (CCL) based alignment algorithm to align and convert the output of a semantic segmentation model .
+**Summary**: This paper proposes framing adversarial machine learning as an optimal control problem. The machine learning model is treated as a dynamical system, adversarial attacks as control inputs, and the adversary's objectives (harm and stealth) as control costs. This framework encompasses various attack types and suggests leveraging control theory and reinforcement learning techniques for adversarial defense and understanding.
+
+Unable to generate summary after 3 attempts.
+
+## 3. Minimax deviation strategies for machine learning and recognition with short learning samples
+**Authors**: Michail Schlesinger, Evgeniy Vodolazskiy
+
+**Summary**: Unable to generate summary after 3 attempts.
+
+This paper investigates decision-making strategies, defining "improper" strategies as those always outperformed by another. The key finding, **Theorem 1, proves that every strategy is either Bayesian (minimizing expected risk with respect to a weight function) or improper, but not both.** This is demonstrated using a duality theorem applied to a function defined by risk and weight functions, and proven through four supporting propositions.
 

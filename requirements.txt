@@ -5,8 +5,7 @@ sentence-transformers
 faiss-cpu
 numpy
 pandas
-pypdf
 scikit-learn
 streamlit
-fastapi
-uvicorn
+google-generativeai
+PyMuPDF
