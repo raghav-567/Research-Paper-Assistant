@@ -17,7 +17,10 @@ class RAGPipeline:
             print("⚠️ No valid text chunks found for embedding.")
             return
 
-        embeddings = self.summarizer_agent.embedding_model.encode(texts, convert_to_numpy=True)
+        # Normalize embeddings for cosine similarity (consistent with SummarizerAgent)
+        embeddings = self.summarizer_agent.embedding_model.encode(
+            texts, convert_to_numpy=True, normalize_embeddings=True
+        ).astype(np.float32)
 
         if embeddings.ndim == 1:
             embeddings = embeddings.reshape(1, -1)
@@ -27,8 +30,9 @@ class RAGPipeline:
 
         d = embeddings.shape[1]
 
+        # Use FAISS IndexFlatIP for cosine similarity
         if self.index is None:
-            self.index = faiss.IndexFlatL2(d)
+            self.index = faiss.IndexFlatIP(d)
         elif self.index.d != d:
             raise ValueError(
                 f"Embedding dimension mismatch: Index expects {self.index.d}, but new embeddings have {d}"
@@ -49,7 +53,10 @@ class RAGPipeline:
             self.paper_metadata[paper_info["id"]] = paper_info
 
     def query(self, query, top_k_chunks=200, top_k_papers=3, chunks_per_paper=10):
-        query_emb = self.summarizer_agent.embedding_model.encode([query], convert_to_numpy=True)
+        query_emb = self.summarizer_agent.embedding_model.encode(
+            [query], convert_to_numpy=True, normalize_embeddings=True
+        ).astype(np.float32)
+
         if query_emb.ndim == 1:
             query_emb = query_emb.reshape(1, -1)
 
