@@ -23,7 +23,7 @@ def run(query):
 
     # 2. Initialize FAISS + metadata store
     dim = summarizer.embedding_model.get_sentence_embedding_dimension()
-    index = faiss.IndexFlatL2(dim)
+    index = faiss.IndexFlatIP(dim)
     id_to_metadata = {}
 
     rag = RAGPipeline(
