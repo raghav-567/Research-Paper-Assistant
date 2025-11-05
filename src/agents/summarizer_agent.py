@@ -2,6 +2,7 @@ import google.generativeai as genai
 from sentence_transformers import SentenceTransformer
 from src.utils import get_logger
 import numpy as np
+import faiss
 import time
 
 logger = get_logger("SummarizerAgent")
@@ -23,17 +24,22 @@ class SummarizerAgent:
     def get_top_k_chunks(self, chunks, embeddings, query_embedding, k=10):
         if len(chunks) == 0 or embeddings.size == 0:
             return []
-        scores = np.dot(embeddings, query_embedding)
-        k = min(k, len(chunks))  # Don't try to get more chunks than available
-        top_k_idx = np.argsort(scores)[-k:][::-1]
+
+        # Build FAISS index
+        dim = embeddings.shape[1]
+        index = faiss.IndexFlatIP(dim)  # inner product for cosine similarity if normalized
+        index.add(embeddings.astype(np.float32))
+
+        query_embedding = np.array([query_embedding]).astype(np.float32)
+        scores, indices = index.search(query_embedding, min(k, len(chunks)))
+
+        top_k_idx = indices[0]
         return [chunks[i] for i in top_k_idx]
 
     def _summarize_text(self, text, max_output_tokens=256, retry_count=3):
-        """Summarize text with retry logic"""
         if not text or not text.strip():
             return "No content available to summarize."
         
-        # Truncate if too long
         max_input_length = 5000
         if len(text) > max_input_length:
             text = text[:max_input_length] + "..."
@@ -72,7 +78,6 @@ class SummarizerAgent:
         abstract = None
         chunks = []
 
-        # Handle input format
         if isinstance(paper_data, dict):
             abstract = paper_data.get("abstract", "")
             chunk_list = paper_data.get("chunks", [])
@@ -86,24 +91,16 @@ class SummarizerAgent:
             logger.warning("No content available for summarization")
             return "No content available."
 
-        # Step 1: Summarize abstract
         abs_summary = ""
         if abstract and abstract.strip():
             logger.info("Summarizing abstract...")
             abs_summary = self._summarize_text(abstract, max_output_tokens=150)
 
-        # Step 2: Summarize body chunks
         body_summary = ""
         if chunks:
-            # Filter out empty chunks
             chunks = [c for c in chunks if c and c.strip()]
-            
-            if not chunks:
-                logger.warning("All chunks were empty after filtering")
-            else:
+            if chunks:
                 logger.info(f"Processing {len(chunks)} non-empty chunks")
-                
-                # Select relevant chunks
                 if query:
                     logger.info(f"Using query-based chunk selection: {query}")
                     try:
@@ -118,7 +115,6 @@ class SummarizerAgent:
 
                 logger.info(f"Selected {len(top_chunks)} chunks for summarization")
 
-                # Generate mini-summaries for each chunk
                 mini_summaries = []
                 for i, chunk in enumerate(top_chunks):
                     logger.info(f"Summarizing chunk {i+1}/{len(top_chunks)}")
@@ -126,7 +122,6 @@ class SummarizerAgent:
                     if mini and not mini.startswith("Error") and not mini.startswith("Unable"):
                         mini_summaries.append(mini)
 
-                # Combine mini-summaries
                 if mini_summaries:
                     combined = " ".join(mini_summaries)
                     logger.info("Generating final body summary from mini-summaries")
@@ -134,7 +129,6 @@ class SummarizerAgent:
                 else:
                     logger.warning("No valid mini-summaries generated")
 
-        # Step 3: Merge summaries
         final_summary = ""
         if abs_summary and body_summary:
             if not abs_summary.startswith("Error") and not body_summary.startswith("Error"):
