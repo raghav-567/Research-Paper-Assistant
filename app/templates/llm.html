@@ -22,7 +22,6 @@
             overflow-x: hidden;
         }
         
-        /* Glassmorphism Header */
         .glass-header {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(20px);
@@ -93,7 +92,7 @@
             50% { opacity: 0.7; transform: scale(1.1); }
         }
         
-        /* Main Content */
+       
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -144,7 +143,6 @@
             gap: 1.5rem;
         }
         
-        /* Message Styles */
         .message {
             display: flex;
             max-width: 80%;
@@ -267,8 +265,7 @@
             cursor: not-allowed;
             transform: none;
         }
-        
-        /* Paper Cards */
+       
         .paper-card {
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(25px);
@@ -323,7 +320,7 @@
             border: 1px solid rgba(138, 43, 226, 0.2);
         }
         
-        /* Progress Bar */
+        
         .progress-container {
             width: 100%;
             background-color: rgba(138, 43, 226, 0.1);
@@ -339,7 +336,7 @@
             transition: width 0.3s ease;
         }
         
-        /* Status Messages */
+       
         .status-message {
             padding: 1rem;
             border-radius: 12px;
@@ -367,7 +364,7 @@
             border: 1px solid rgba(245, 158, 11, 0.25);
         }
         
-        /* Loading Animation */
+    
         .typing-indicator {
             display: flex;
             align-items: center;
@@ -409,7 +406,7 @@
     transform: translateY(-1px);
 }
 
-/* Ensure the review card style is defined */
+
 .review-card {
     padding: 1.5rem;
     background: rgba(255, 255, 255, 0.95);
@@ -516,8 +513,7 @@
             0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
             40% { transform: scale(1); opacity: 1; }
         }
-        
-        /* Responsive Design */
+      
         @media (max-width: 768px) {
             .glass-header {
                 flex-direction: column;
@@ -548,7 +544,6 @@
             }
         }
         
-        /* Scrollbar Styling */
         .chat-messages::-webkit-scrollbar {
             width: 6px;
         }
@@ -569,7 +564,7 @@
     </style>
 </head>
 <body>
-    <!-- Glassmorphism Header -->
+    
     <div class="glass-header">
         <div class="glass-logo">
             <i class="fas fa-microscope"></i> Research Assistant
@@ -590,10 +585,10 @@
         <h1 class="main-header">🔬 Research Paper Assistant</h1>
         <p class="tagline">Your Intelligent Literature Companion, powered by AI and RAG.</p>
         
-        <!-- Chat Container -->
+       
         <div class="chat-container">
             <div class="chat-messages" id="chatMessages">
-                <!-- Initial bot message -->
+               
                 <div class="message bot-message">
                     <div class="message-icon">
                         <i class="fas fa-robot"></i>
