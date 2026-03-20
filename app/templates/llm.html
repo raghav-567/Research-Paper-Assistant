@@ -360,6 +360,12 @@
             color: #dc2626;
             border: 1px solid rgba(239, 68, 68, 0.2);
         }
+
+        .status-warning {
+            background-color: rgba(245, 158, 11, 0.12);
+            color: #b45309;
+            border: 1px solid rgba(245, 158, 11, 0.25);
+        }
         
         /* Loading Animation */
         .typing-indicator {
@@ -410,6 +416,84 @@
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(138, 43, 226, 0.15);
     border: 1px solid rgba(138, 43, 226, 0.2);
+}
+
+.message.review-message {
+    max-width: 100%;
+}
+
+.message.review-message .message-content {
+    width: 100%;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+.review-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.review-badge {
+    background: rgba(138, 43, 226, 0.08);
+    color: #6b46c1;
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    border: 1px solid rgba(138, 43, 226, 0.16);
+}
+
+.review-warning {
+    margin-bottom: 1rem;
+    padding: 0.9rem 1rem;
+    border-radius: 12px;
+    background: rgba(245, 158, 11, 0.12);
+    color: #9a3412;
+    border: 1px solid rgba(245, 158, 11, 0.22);
+}
+
+.review-body {
+    color: #2d2363;
+    line-height: 1.7;
+}
+
+.review-body h1,
+.review-body h2,
+.review-body h3 {
+    color: #6b46c1;
+    margin-top: 1.15rem;
+    margin-bottom: 0.6rem;
+}
+
+.review-body h1 {
+    font-size: 1.55rem;
+}
+
+.review-body h2 {
+    font-size: 1.2rem;
+}
+
+.review-body h3 {
+    font-size: 1rem;
+}
+
+.review-body p {
+    margin: 0.6rem 0;
+}
+
+.review-body ul {
+    margin: 0.6rem 0 0.9rem 1.25rem;
+}
+
+.review-body li {
+    margin-bottom: 0.35rem;
+}
+
+.review-body strong {
+    color: #2f1f74;
 }
         
         .typing-dots {
@@ -534,27 +618,105 @@
     const chatMessages = document.getElementById('chatMessages');
     const userInput = document.getElementById('userInput');
     const sendButton = document.getElementById('sendButton');
-    
-    const API_BASE_URL = 'http://localhost:5001'; // Your backend URL
-    
-    // Function to add a message to the chat
-    function addMessage(content, isUser = false) {
+    const glassStatus = document.querySelector('.glass-status');
+    const API_BASE_URL = window.location.origin;
+    let isGenerating = false;
+
+    function escapeHtml(value) {
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function formatInline(text) {
+        let escaped = escapeHtml(text);
+        escaped = escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        escaped = escaped.replace(/`(.+?)`/g, '<code>$1</code>');
+        return escaped;
+    }
+
+    function renderMarkdown(markdown) {
+        const lines = String(markdown || '').split('\n');
+        const html = [];
+        let inList = false;
+
+        function closeList() {
+            if (inList) {
+                html.push('</ul>');
+                inList = false;
+            }
+        }
+
+        for (const rawLine of lines) {
+            const line = rawLine.trim();
+
+            if (!line) {
+                closeList();
+                continue;
+            }
+
+            if (line.startsWith('### ')) {
+                closeList();
+                html.push(`<h3>${formatInline(line.slice(4))}</h3>`);
+                continue;
+            }
+
+            if (line.startsWith('## ')) {
+                closeList();
+                html.push(`<h2>${formatInline(line.slice(3))}</h2>`);
+                continue;
+            }
+
+            if (line.startsWith('# ')) {
+                closeList();
+                html.push(`<h1>${formatInline(line.slice(2))}</h1>`);
+                continue;
+            }
+
+            if (line.startsWith('- ') || line.startsWith('* ')) {
+                if (!inList) {
+                    html.push('<ul>');
+                    inList = true;
+                }
+                html.push(`<li>${formatInline(line.slice(2))}</li>`);
+                continue;
+            }
+
+            closeList();
+            html.push(`<p>${formatInline(line)}</p>`);
+        }
+
+        closeList();
+        return html.join('');
+    }
+
+    function setAppStatus(label, busy = false) {
+        if (!glassStatus) return;
+        const pulse = '<div class="status-pulse"></div>';
+        glassStatus.innerHTML = `${pulse}${escapeHtml(label)}`;
+        glassStatus.style.opacity = busy ? '0.85' : '1';
+    }
+
+    function addMessage(content, isUser = false, options = {}) {
         const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
-        
+        messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'} ${options.variant || ''}`.trim();
+
         const iconDiv = document.createElement('div');
         iconDiv.className = 'message-icon';
         iconDiv.innerHTML = isUser ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
-        
+
         const contentDiv = document.createElement('div');
         contentDiv.className = 'message-content';
-        
+
         if (typeof content === 'string') {
-            contentDiv.innerHTML = `<p>${content}</p>`;
+            contentDiv.innerHTML = `<p>${escapeHtml(content)}</p>`;
         } else {
             contentDiv.appendChild(content);
         }
-        
+
         if (isUser) {
             messageDiv.appendChild(contentDiv);
             messageDiv.appendChild(iconDiv);
@@ -562,84 +724,83 @@
             messageDiv.appendChild(iconDiv);
             messageDiv.appendChild(contentDiv);
         }
-        
+
         chatMessages.appendChild(messageDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
-    
-    // Function to show progress
+
     function showProgress(progress, status) {
+        hideProgress();
         const progressDiv = document.createElement('div');
         progressDiv.className = 'message bot-message';
         progressDiv.id = 'progressIndicator';
-        
+
         const iconDiv = document.createElement('div');
         iconDiv.className = 'message-icon';
         iconDiv.innerHTML = '<i class="fas fa-robot"></i>';
-        
+
         const contentDiv = document.createElement('div');
         contentDiv.className = 'message-content';
-        
         contentDiv.innerHTML = `
-            <div style="margin-bottom: 0.5rem;">${status}</div>
+            <div class="progress-status" style="margin-bottom: 0.5rem;">${escapeHtml(status)}</div>
             <div class="progress-container">
                 <div class="progress-bar" style="width: ${progress}%"></div>
             </div>
         `;
-        
+
         progressDiv.appendChild(iconDiv);
         progressDiv.appendChild(contentDiv);
         chatMessages.appendChild(progressDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
-    
-    // Function to update progress
+
     function updateProgress(progress, status) {
         const progressIndicator = document.getElementById('progressIndicator');
-        if (progressIndicator) {
-            const progressBar = progressIndicator.querySelector('.progress-bar');
-            const statusText = progressIndicator.querySelector('div');
-            
-            if (progressBar) progressBar.style.width = `${progress}%`;
-            if (statusText) statusText.textContent = status;
-        }
+        if (!progressIndicator) return;
+
+        const progressBar = progressIndicator.querySelector('.progress-bar');
+        const statusText = progressIndicator.querySelector('.progress-status');
+
+        if (progressBar) progressBar.style.width = `${progress}%`;
+        if (statusText) statusText.textContent = status;
+        chatMessages.scrollTop = chatMessages.scrollHeight;
     }
-    
-    // Function to hide progress
+
     function hideProgress() {
         const progress = document.getElementById('progressIndicator');
         if (progress) {
             progress.remove();
         }
     }
-    
-    // Function to show status message
+
     function showStatus(message, type = 'success') {
+        const iconMap = {
+            success: '<i class="fas fa-check-circle"></i>',
+            error: '<i class="fas fa-exclamation-circle"></i>',
+            warning: '<i class="fas fa-triangle-exclamation"></i>',
+        };
+
         const statusDiv = document.createElement('div');
-        statusDiv.className = `message bot-message`;
-        
+        statusDiv.className = 'message bot-message';
+
         const iconDiv = document.createElement('div');
         iconDiv.className = 'message-icon';
-        iconDiv.innerHTML = type === 'success' ? 
-            '<i class="fas fa-check-circle"></i>' : 
-            '<i class="fas fa-exclamation-circle"></i>';
-        
+        iconDiv.innerHTML = iconMap[type] || iconMap.success;
+
         const contentDiv = document.createElement('div');
         contentDiv.className = `message-content status-message status-${type}`;
-        contentDiv.innerHTML = `<p>${message}</p>`;
-        
+        contentDiv.innerHTML = `<p>${escapeHtml(message)}</p>`;
+
         statusDiv.appendChild(iconDiv);
         statusDiv.appendChild(contentDiv);
         chatMessages.appendChild(statusDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // Function to generate literature review card
-    function generateReviewCard(review, query, timestamp) {
+    function generateReviewCard(review, query, timestamp, data) {
         const reviewCard = document.createElement('div');
         reviewCard.className = 'review-card';
-        
-        // Create download functionality
+
         const downloadReview = () => {
             const element = document.createElement('a');
             const file = new Blob([review], {type: 'text/markdown'});
@@ -648,111 +809,119 @@
             document.body.appendChild(element);
             element.click();
             document.body.removeChild(element);
+            URL.revokeObjectURL(element.href);
         };
-        
+
+        const outputLabel = data.output_file ? data.output_file.replace(/^outputs\//, '') : 'review.md';
+        const warningHtml = data.used_fallback_summary
+            ? `<div class="review-warning"><strong>Fallback summaries used.</strong> Gemini quota is unavailable, so the review uses local extractive summaries for this run.</div>`
+            : '';
+
         reviewCard.innerHTML = `
             <div class="review-header">
                 <div class="review-title">
                     <i class="fas fa-file-alt"></i> Generated Literature Review
                 </div>
-                <button class="download-btn" id="downloadBtn">
+                <button class="download-btn" type="button">
                     <i class="fas fa-download"></i> Download
                 </button>
             </div>
-            <div style="white-space: pre-line; line-height: 1.6; font-family: 'Inter', sans-serif;">${review}</div>
+            <div class="review-meta">
+                <span class="review-badge"><i class="fas fa-book-open"></i> ${escapeHtml(String(data.papers_count || 0))} papers</span>
+                <span class="review-badge"><i class="fas fa-clock"></i> ${escapeHtml(timestamp || 'Generated')}</span>
+                <span class="review-badge"><i class="fas fa-folder-open"></i> ${escapeHtml(outputLabel)}</span>
+            </div>
+            ${warningHtml}
+            <div class="review-body">${renderMarkdown(review)}</div>
         `;
-        
-        // Add event listener to download button
-        setTimeout(() => {
-            const downloadBtn = document.getElementById('downloadBtn');
-            if (downloadBtn) {
-                downloadBtn.addEventListener('click', downloadReview);
-            }
-        }, 100);
-        
+
+        const downloadBtn = reviewCard.querySelector('.download-btn');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', downloadReview);
+        }
+
         return reviewCard;
     }
 
     async function handleUserInput() {
-        const query = userInput.value.trim();
-        if (!query) {
-            showStatus("Please enter a research query to generate a literature review.", "error");
+        if (isGenerating) {
             return;
         }
 
+        const query = userInput.value.trim();
+        if (!query) {
+            showStatus('Please enter a research query to generate a literature review.', 'error');
+            return;
+        }
+
+        isGenerating = true;
         sendButton.disabled = true;
-     
+        userInput.disabled = true;
+        setAppStatus('Working', true);
         addMessage(query, true);
-        
-        
         userInput.value = '';
 
         try {
-            // Step 1: Initialization
-            showProgress(10, "🔧 Initializing research pipeline...");
-            
-            // Step 2: Search arXiv
-            updateProgress(20, `🔍 Searching arXiv for '${query}'`);
-            
-            // Step 3: Call backend API (this will call your actual Python agents)
-            updateProgress(40, "🤖 Connecting to research agents...");
-            
+            showProgress(12, 'Initializing research pipeline...');
+            updateProgress(26, `Searching arXiv for "${query}"...`);
+
             const response = await fetch(`${API_BASE_URL}/generate-review`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ query: query })
+                body: JSON.stringify({ query })
             });
 
-            if (!response.ok) {
-                throw new Error(`Server error: ${response.status}`);
+            let data = {};
+            try {
+                data = await response.json();
+            } catch (parseError) {
+                data = {};
             }
 
-            const data = await response.json();
-            
+            if (!response.ok) {
+                throw new Error(data.error || `Server error: ${response.status}`);
+            }
+
             if (data.error) {
                 throw new Error(data.error);
             }
 
-            // Step 4: Processing papers
-            updateProgress(60, "📄 Processing research papers...");
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // Step 5: Synthesizing review
-            updateProgress(80, "🧠 Synthesizing literature review...");
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            // Step 6: Complete
-            updateProgress(100, "✅ Complete!");
-            await new Promise(resolve => setTimeout(resolve, 500));
+            updateProgress(88, 'Formatting literature review...');
+            const reviewContainer = generateReviewCard(data.review, query, data.timestamp, data);
 
             hideProgress();
-            showStatus("Literature Review Generated Successfully!");
+            if (data.used_fallback_summary) {
+                showStatus('Review generated with fallback summaries because Gemini quota is unavailable.', 'warning');
+            } else {
+                showStatus('Literature review generated successfully.', 'success');
+            }
 
-            const reviewContainer = generateReviewCard(data.review, query, data.timestamp);
-            addMessage(reviewContainer);
-
+            addMessage(reviewContainer, false, { variant: 'review-message' });
+            setAppStatus('Online', false);
         } catch (error) {
             hideProgress();
-            showStatus(`❌ Error: ${error.message}`, "error");
+            showStatus(error.message || 'Something went wrong while generating the review.', 'error');
+            setAppStatus('Attention', false);
             console.error('Generation error:', error);
         } finally {
-         
+            isGenerating = false;
             sendButton.disabled = false;
+            userInput.disabled = false;
+            userInput.focus();
         }
     }
 
- 
     sendButton.addEventListener('click', handleUserInput);
-    
-    userInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
+
+    userInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !isGenerating) {
+            e.preventDefault();
             handleUserInput();
         }
     });
-    
- 
+
     document.querySelectorAll('.glass-nav-item').forEach(item => {
         item.addEventListener('click', function() {
             document.querySelectorAll('.glass-nav-item').forEach(i => i.classList.remove('active'));
