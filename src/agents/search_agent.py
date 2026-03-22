@@ -1,40 +1,61 @@
 import arxiv
 import requests
-import os
 from pathlib import Path
 from src.utils import get_logger
 
 logger = get_logger("SearchAgent")
 
 class SearchAgent:
-    def __init__(self, pdf_dir="pdfs"):
+    def __init__(self, pdf_dir="pdfs", delay_seconds=5.0, num_retries=5):
         self.pdf_dir = Path(pdf_dir)
         self.pdf_dir.mkdir(parents=True, exist_ok=True)
+        self.delay_seconds = delay_seconds
+        self.num_retries = num_retries
 
     def search_arxiv(self, query, max_results=3):
         logger.info(f"Searching Arxiv for: {query}")
-        results = arxiv.Search(
+        search = arxiv.Search(
             query=query, 
             max_results=max_results, 
             sort_by=arxiv.SortCriterion.Relevance
         )
-        papers = []
-        for r in results.results():
-            paper_id = r.entry_id.split("/")[-1]
-            pdf_url = r.pdf_url
-            pdf_path = self.download_pdf(pdf_url, paper_id) if pdf_url else None
-            if not pdf_path:
-                logger.warning(f"No PDF for {r.title}, falling back to abstract")
+        client = arxiv.Client(
+            page_size=max(1, min(max_results, 10)),
+            delay_seconds=self.delay_seconds,
+            num_retries=self.num_retries,
+        )
 
-            papers.append({
-                "id": paper_id,
-                "title": r.title,
-                "summary": r.summary,
-                "authors": [a.name for a in r.authors],
-                "pdf_path": pdf_path,  # path(url) to downloaded PDF, else None
-                "url": r.entry_id,
-                "published": r.published
-            })
+        papers = []
+        try:
+            for r in client.results(search):
+                paper_id = r.entry_id.split("/")[-1]
+                pdf_url = r.pdf_url
+                pdf_path = self.download_pdf(pdf_url, paper_id) if pdf_url else None
+                if not pdf_path:
+                    logger.warning(f"No PDF for {r.title}, falling back to abstract")
+
+                papers.append({
+                    "id": paper_id,
+                    "title": r.title,
+                    "summary": r.summary,
+                    "authors": [a.name for a in r.authors],
+                    "pdf_path": pdf_path,
+                    "url": r.entry_id,
+                    "published": r.published
+                })
+        except arxiv.HTTPError as e:
+            logger.warning(f"arXiv request failed with HTTP {e.status} for query '{query}'")
+            if e.status in {429, 503}:
+                raise RuntimeError(
+                    "arXiv is temporarily rate-limiting or unavailable. Please wait a minute and try again."
+                ) from e
+            raise RuntimeError(f"arXiv request failed with HTTP {e.status}. Please try again shortly.") from e
+        except requests.exceptions.RequestException as e:
+            logger.warning(f"Network error while querying arXiv for '{query}': {e}")
+            raise RuntimeError(
+                "Unable to reach arXiv right now. Please check your network connection and try again."
+            ) from e
+
         return papers
 
     def download_pdf(self, pdf_url: str, paper_id: str):
