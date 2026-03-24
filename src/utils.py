@@ -1,5 +1,7 @@
 import logging
+import os
 from datetime import datetime
+from typing import Optional
 
 def get_logger(name: str):
     logger = logging.getLogger(name)
@@ -13,3 +15,6 @@ def get_logger(name: str):
 
 def timestamp():
     return datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+def get_api_key() -> Optional[str]:
+    return os.getenv("API_KEY") or os.getenv("GEMINI_API_KEY")
