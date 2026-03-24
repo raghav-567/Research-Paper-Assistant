@@ -3,6 +3,8 @@ from sentence_transformers import SentenceTransformer
 from src.utils import get_logger
 import numpy as np
 import faiss
+import os
+import re
 import time
 
 logger = get_logger("SummarizerAgent")
@@ -10,8 +12,11 @@ logger = get_logger("SummarizerAgent")
 class SummarizerAgent:
     def __init__(self, api_key: str):
         genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel("gemini-2.0-flash-exp") 
+        self.model_name = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
+        self.model = genai.GenerativeModel(self.model_name)
         self.embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+        self.quota_exhausted = False
+        self.quota_error_message = None
 
     def embed_chunks(self, chunks, normalize=True):
         logger.info(f"Generating embeddings for {len(chunks)} chunks")
@@ -36,15 +41,78 @@ class SummarizerAgent:
         top_k_idx = indices[0]
         return [chunks[i] for i in top_k_idx]
 
+    def _extract_response_text(self, response):
+        if not response:
+            return ""
+
+        text = getattr(response, "text", "") or ""
+        if text.strip():
+            return text.strip()
+
+        candidates = getattr(response, "candidates", None) or []
+        parts = []
+        for candidate in candidates:
+            content = getattr(candidate, "content", None)
+            content_parts = getattr(content, "parts", None) or []
+            for part in content_parts:
+                part_text = getattr(part, "text", "") or ""
+                if part_text.strip():
+                    parts.append(part_text.strip())
+
+        return "\n".join(parts).strip()
+
+    def _is_quota_error(self, error_message):
+        message = (error_message or "").lower()
+        return (
+            "exceeded your current quota" in message
+            or "quota exceeded" in message
+            or "generate_content_free_tier" in message
+            or "429" in message and "quota" in message
+        )
+
+    def _fallback_summary(self, text, max_chars=700):
+        cleaned = re.sub(r"\s+", " ", text or "").strip()
+        if not cleaned:
+            return "No content available to summarize."
+
+        cleaned = re.sub(r"\b(Abstract:|Main Content:)\s*", "", cleaned, flags=re.I)
+        sentences = re.split(r"(?<=[.!?])\s+", cleaned)
+
+        selected = []
+        current_length = 0
+        for sentence in sentences:
+            sentence = sentence.strip()
+            if not sentence:
+                continue
+            projected = current_length + len(sentence) + (1 if selected else 0)
+            if projected > max_chars and selected:
+                break
+            selected.append(sentence)
+            current_length = projected
+            if len(selected) >= 4:
+                break
+
+        if selected:
+            return " ".join(selected)
+
+        words = cleaned.split()
+        truncated = " ".join(words[: min(len(words), 100)])
+        return truncated + ("..." if len(words) > 100 else "")
+
     def _summarize_text(self, text, max_output_tokens=256, retry_count=3):
         if not text or not text.strip():
             return "No content available to summarize."
+
+        if self.quota_exhausted:
+            logger.warning("Gemini quota already exhausted; using local fallback summary.")
+            return self._fallback_summary(text)
         
-        max_input_length = 5000
+        max_input_length = 4000
         if len(text) > max_input_length:
             text = text[:max_input_length] + "..."
             logger.warning(f"Text truncated to {max_input_length} characters")
         
+        last_error = None
         for attempt in range(retry_count):
             try:
                 prompt = f"Summarize the following academic text concisely, focusing on key findings and methods:\n\n{text}"
@@ -56,20 +124,42 @@ class SummarizerAgent:
                     },
                 )
                 
-                if response and response.text:
-                    summary = response.text.strip()
+                summary = self._extract_response_text(response)
+                if summary:
                     logger.info(f"Successfully generated summary ({len(summary)} chars)")
                     return summary
                 else:
-                    logger.warning(f"Empty response from Gemini (attempt {attempt + 1})")
+                    finish_reason = ""
+                    candidates = getattr(response, "candidates", None) or []
+                    if candidates:
+                        finish_reason = getattr(candidates[0], "finish_reason", "")
+                    logger.warning(
+                        f"Empty response from Gemini model {self.model_name} "
+                        f"(attempt {attempt + 1}/{retry_count}, finish_reason={finish_reason})"
+                    )
+                    last_error = "Gemini returned an empty response."
                     
             except Exception as e:
-                logger.error(f"Gemini API error (attempt {attempt + 1}/{retry_count}): {e}")
+                last_error = str(e)
+                logger.error(
+                    f"Gemini API error with model {self.model_name} "
+                    f"(attempt {attempt + 1}/{retry_count}): {e}"
+                )
+                if self._is_quota_error(last_error):
+                    self.quota_exhausted = True
+                    self.quota_error_message = last_error
+                    logger.warning("Gemini quota exhausted; falling back to extractive summaries for remaining papers.")
+                    return self._fallback_summary(text)
                 if attempt < retry_count - 1:
                     time.sleep(2 ** attempt) 
                 else:
-                    return f"Unable to generate summary after {retry_count} attempts."
+                    return (
+                        f"Unable to generate summary after {retry_count} attempts. "
+                        f"Last error: {last_error}"
+                    )
         
+        if last_error:
+            return f"Error generating summary. Last error: {last_error}"
         return "Error generating summary."
 
     def summarize_chunks(self, paper_data, query=None, k=10):
