@@ -32,7 +32,7 @@ An intelligent, multi-agent system for automated academic literature review gene
 - **📝 AI Summarization**: Powered by Google Gemini for high-quality summaries
 - **📚 Literature Synthesis**: Automatic generation of structured literature reviews
 - **🎯 Multi-Agent Architecture**: Specialized agents for different tasks
-- **🖥️ Multiple Interfaces**: CLI, Streamlit UI, and FastAPI backend
+- **🖥️ Multiple Interfaces**: CLI workflow and Flask web interface
 
 ---
 
@@ -134,20 +134,20 @@ pip install -r requirements.txt
 Create a `.env` file in the root directory:
 
 ```bash
-GEMINI_API_KEY=your_gemini_api_key_here
+API_KEY=your_gemini_api_key_here
 ```
 
 Or export as environment variable:
 
 ```bash
 # On Windows (Command Prompt):
-set GEMINI_API_KEY=your_gemini_api_key_here
+set API_KEY=your_gemini_api_key_here
 
 # On Windows (PowerShell):
-$env:GEMINI_API_KEY="your_gemini_api_key_here"
+$env:API_KEY="your_gemini_api_key_here"
 
 # On macOS/Linux:
-export GEMINI_API_KEY="your_gemini_api_key_here"
+export API_KEY="your_gemini_api_key_here"
 ```
 
 ---
@@ -165,22 +165,13 @@ review = run("machine learning optimization")
 
 The generated review will be saved in `outputs/sample_review_optimized.md`
 
-### Using Streamlit UI
+### Using Flask Web App
 
 ```bash
-streamlit run app/streamlit_app.py
+python app/app.py
 ```
 
-Then open your browser to `http://localhost:8501`
-
-### Using FastAPI Backend
-
-```bash
-uvicorn app.fastapi_app:app --reload
-```
-
-API will be available at `http://localhost:8000`
-API documentation at `http://localhost:8000/docs`
+Then open your browser to `http://localhost:5001`
 
 ---
 
@@ -202,20 +193,19 @@ Agentic-Research-Assistant/
 │   └── main.py                     # Orchestrator (ties all agents)
 │
 ├── app/
-│   ├── streamlit_app.py            # Frontend UI
-│   └── fastapi_app.py              # REST API backend
+│   ├── app.py                      # Flask backend
+│   └── templates/
+│       └── llm.html                # Web UI template
 │
 ├── outputs/
-│   ├── sample_review_optimized.md  # Generated literature reviews
-│   └── references.bib              # BibTeX references
+│   └── sample_review_optimized.md  # Generated literature reviews
 │
 ├── pdfs/                           # Downloaded PDFs (auto-created)
-├── logs/                           # Application logs (auto-created)
 │
 ├── requirements.txt                # Python dependencies
 ├── .env.example                    # Environment variables template
 ├── .gitignore
-└── README.md                       # This file
+└── readme.md                       # This file
 ```
 
 ---
@@ -317,6 +307,9 @@ Create a `.env` file:
 
 ```bash
 # Required
+API_KEY=your_gemini_api_key
+
+# Backwards-compatible alternative
 GEMINI_API_KEY=your_gemini_api_key
 
 # Optional
@@ -511,7 +504,7 @@ from src.rag_pipeline import RAGPipeline
 import faiss
 
 dim = summarizer.embedding_model.get_sentence_embedding_dimension()
-index = faiss.IndexFlatL2(dim)
+index = faiss.IndexFlatIP(dim)
 
 rag = RAGPipeline(
     search_agent=search,
