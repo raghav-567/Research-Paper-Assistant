@@ -1,9 +1,17 @@
+import sys
+from pathlib import Path
+
+if __package__ is None or __package__ == "":
+    project_root = Path(__file__).resolve().parents[1]
+    if str(project_root) not in sys.path:
+        sys.path.insert(0, str(project_root))
+
 from src.agents.search_agent import SearchAgent
 from src.agents.extraction_agent import ExtractionAgent
 from src.agents.summarizer_agent import SummarizerAgent
 from src.agents.synthesizer_agent import SynthesizerAgent
 from src.rag_pipeline import RAGPipeline
-from src.utils import get_logger
+from src.utils import get_api_key, get_logger
 import faiss
 import os
 import time
@@ -12,9 +20,15 @@ from dotenv import load_dotenv
 logger = get_logger("Main")
 load_dotenv()
 
-api_key = os.getenv("API_KEY")
+def generate_review(query, max_results=3, output_file="outputs/sample_review_optimized.md", inter_paper_delay=2):
+    query = (query or "").strip()
+    if not query:
+        raise ValueError("Query is required.")
 
-def run(query):
+    api_key = get_api_key()
+    if not api_key:
+        raise ValueError("Missing API key. Set API_KEY or GEMINI_API_KEY in the environment.")
+
     # 1. Initialize agents
     search = SearchAgent(pdf_dir="pdfs")
     extraction = ExtractionAgent()
@@ -35,7 +49,7 @@ def run(query):
     )
 
     # 3. Retrieve papers
-    papers = search.search_arxiv(query, max_results=3)
+    papers = search.search_arxiv(query, max_results=max_results)
     logger.info(f"Found {len(papers)} papers from arXiv")
 
     # 4. Process each paper with single-pass summarization
@@ -99,9 +113,9 @@ def run(query):
             logger.info(f"Summary generated: {len(summary)} chars")
             
             # Add delay between papers to avoid rate limiting
-            if i < len(papers) - 1:
-                logger.info("Waiting 2s before next paper...")
-                time.sleep(2)
+            if inter_paper_delay and i < len(papers) - 1:
+                logger.info(f"Waiting {inter_paper_delay}s before next paper...")
+                time.sleep(inter_paper_delay)
         else:
             summary = "No content available to summarize."
             logger.warning(f"No content for {p['title']}")
@@ -130,11 +144,12 @@ def run(query):
     review = synthesizer.synthesize(paper_list, summary_list)
 
     # 6. Save output
-    os.makedirs("outputs", exist_ok=True)
-    output_file = "outputs/sample_review_optimized.md"
-    with open(output_file, "w") as f:
-        f.write(review)
-    logger.info(f"Literature review saved in {output_file}")
+    if output_file:
+        output_dir = os.path.dirname(output_file) or "."
+        os.makedirs(output_dir, exist_ok=True)
+        with open(output_file, "w", encoding="utf-8") as f:
+            f.write(review)
+        logger.info(f"Literature review saved in {output_file}")
     
     # Print summary stats
     logger.info("\n" + "="*60)
@@ -145,7 +160,17 @@ def run(query):
         logger.info(f"   Status: {'✓ Success' if len(item['summary']) > 100 else '✗ Failed'}")
     logger.info("="*60)
     
-    return review
+    return {
+        "review": review,
+        "papers": paper_list,
+        "summaries": summary_list,
+        "output_file": output_file,
+        "used_fallback_summary": summarizer.quota_exhausted,
+        "quota_error": summarizer.quota_error_message,
+    }
+
+def run(query):
+    return generate_review(query)["review"]
 
 if __name__ == "__main__":
     run("Machine learning")
