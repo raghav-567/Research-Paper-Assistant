@@ -12,7 +12,8 @@ logger = get_logger("SummarizerAgent")
 class SummarizerAgent:
     def __init__(self, api_key: str):
         genai.configure(api_key=api_key)
-        self.model_name = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
+        # Use a current free-tier text model by default.
+        self.model_name = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
         self.model = genai.GenerativeModel(self.model_name)
         self.embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
         self.quota_exhausted = False
