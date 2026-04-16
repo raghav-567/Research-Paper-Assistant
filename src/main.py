@@ -36,9 +36,12 @@ def generate_review(query, max_results=3, output_file="outputs/sample_review_opt
     synthesizer = SynthesizerAgent()
 
     # 2. Initialize FAISS + metadata store
-    dim = summarizer.embedding_model.get_sentence_embedding_dimension()
-    index = faiss.IndexFlatIP(dim)
+    dim = summarizer.get_embedding_dimension()
+    index = faiss.IndexFlatIP(dim) if dim is not None else None
     id_to_metadata = {}
+
+    if dim is None:
+        logger.warning("Embedding model unavailable; continuing without FAISS indexing.")
 
     rag = RAGPipeline(
         search_agent=search,
