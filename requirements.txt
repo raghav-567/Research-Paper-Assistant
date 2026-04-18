@@ -1,10 +1,13 @@
 arxiv
+Flask
+flask-cors
 requests
 tqdm
 sentence-transformers
 faiss-cpu
 numpy
 pandas
+python-dotenv
 scikit-learn
 streamlit
 google-generativeai
