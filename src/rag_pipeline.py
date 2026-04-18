@@ -18,9 +18,11 @@ class RAGPipeline:
             return
 
         # Normalize embeddings for cosine similarity (consistent with SummarizerAgent)
-        embeddings = self.summarizer_agent.embedding_model.encode(
-            texts, convert_to_numpy=True, normalize_embeddings=True
-        ).astype(np.float32)
+        embeddings = self.summarizer_agent.embed_chunks(texts, normalize=True)
+        if embeddings.size == 0:
+            print("⚠️ Embeddings unavailable; skipping index build.")
+            return
+        embeddings = embeddings.astype(np.float32)
 
         if embeddings.ndim == 1:
             embeddings = embeddings.reshape(1, -1)
@@ -53,9 +55,13 @@ class RAGPipeline:
             self.paper_metadata[paper_info["id"]] = paper_info
 
     def query(self, query, top_k_chunks=200, top_k_papers=3, chunks_per_paper=10):
-        query_emb = self.summarizer_agent.embedding_model.encode(
-            [query], convert_to_numpy=True, normalize_embeddings=True
-        ).astype(np.float32)
+        if self.index is None:
+            raise ValueError("Index has not been built yet.")
+
+        query_emb = self.summarizer_agent.embed_chunks([query], normalize=True)
+        if query_emb.size == 0:
+            raise ValueError("Embeddings unavailable; cannot query the index.")
+        query_emb = query_emb.astype(np.float32)
 
         if query_emb.ndim == 1:
             query_emb = query_emb.reshape(1, -1)
