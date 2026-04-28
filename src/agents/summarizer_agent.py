@@ -1,5 +1,4 @@
 import google.generativeai as genai
-from sentence_transformers import SentenceTransformer
 from src.utils import get_logger
 import numpy as np
 import faiss
@@ -15,13 +14,43 @@ class SummarizerAgent:
         # Use a current free-tier text model by default.
         self.model_name = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
         self.model = genai.GenerativeModel(self.model_name)
-        self.embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
+        self.embedding_model_name = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
+        self.embedding_model = None
+        self.embedding_error = None
         self.quota_exhausted = False
         self.quota_error_message = None
+
+    def _get_embedding_model(self):
+        if self.embedding_model is not None:
+            return self.embedding_model
+
+        if self.embedding_error is not None:
+            return None
+
+        try:
+            from sentence_transformers import SentenceTransformer
+            self.embedding_model = SentenceTransformer(self.embedding_model_name)
+            return self.embedding_model
+        except Exception as e:
+            self.embedding_error = str(e)
+            logger.warning(
+                f"Embedding model '{self.embedding_model_name}' is unavailable. "
+                f"RAG indexing will be skipped. Error: {e}"
+            )
+            return None
+
+    def get_embedding_dimension(self):
+        model = self._get_embedding_model()
+        if model is None:
+            return None
+        return model.get_sentence_embedding_dimension()
 
     def embed_chunks(self, chunks, normalize=True):
         logger.info(f"Generating embeddings for {len(chunks)} chunks")
         if not chunks:
+            return np.array([])
+        model = self._get_embedding_model()
+        if model is None:
             return np.array([])
         return self.embedding_model.encode(
             chunks, convert_to_numpy=True, normalize_embeddings=normalize
@@ -33,7 +62,7 @@ class SummarizerAgent:
 
         # Build FAISS index
         dim = embeddings.shape[1]
-        index = faiss.IndexFlatIP(dim)  # inner product for cosine similarity if normalized
+        index = faiss.IndexFlatIP(dim) 
         index.add(embeddings.astype(np.float32))
 
         query_embedding = np.array([query_embedding]).astype(np.float32)
