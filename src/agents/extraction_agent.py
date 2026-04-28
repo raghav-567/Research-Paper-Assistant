@@ -1,12 +1,39 @@
-import fitz  
 import re
 from src.utils import get_logger
 
 logger = get_logger("ExtractionAgent")
 
 class ExtractionAgent:
+    def __init__(self):
+        self._fitz = None
+        self._fitz_error = None
+
+    def _get_fitz(self):
+        if self._fitz is not None:
+            return self._fitz
+
+        if self._fitz_error is not None:
+            return None
+
+        try:
+            import fitz
+            self._fitz = fitz
+            return self._fitz
+        except Exception as e:
+            self._fitz_error = str(e)
+            logger.warning(
+                f"PyMuPDF is unavailable, PDF parsing will be skipped. Error: {e}"
+            )
+            return None
+
     def parse_pdf(self, pdf_path, paper_id=None):
         """Extract abstract + body from PDF, clean, and return chunks"""
+        fitz = self._get_fitz()
+        if fitz is None:
+            raise RuntimeError(
+                "PyMuPDF is unavailable in the current environment, so PDF parsing cannot run."
+            )
+
         logger.info(f"Extracting text from PDF: {pdf_path}")
         doc = fitz.open(pdf_path)
 
