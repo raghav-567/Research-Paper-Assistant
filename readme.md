@@ -105,7 +105,7 @@ The system uses a multi-agent architecture with specialized components:
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/agentic-research-assistant.git
+git clone https://github.com/raghav-567/agentic-research-assistant.git
 cd agentic-research-assistant
 ```
 
