@@ -12,20 +12,32 @@ from src.agents.summarizer_agent import SummarizerAgent
 from src.agents.synthesizer_agent import SynthesizerAgent
 from src.rag_pipeline import RAGPipeline
 from src.utils import get_api_key, get_logger
-import faiss
 import os
 import time
 from dotenv import load_dotenv
 
+try:
+    import faiss
+    _FAISS_IMPORT_ERROR = None
+except Exception as e:
+    faiss = None
+    _FAISS_IMPORT_ERROR = str(e)
+
 logger = get_logger("Main")
 load_dotenv()
 
-def generate_review(query, max_results=3, output_file="outputs/sample_review_optimized.md", inter_paper_delay=2):
+def generate_review(
+    query,
+    max_results=3,
+    output_file="outputs/sample_review_optimized.md",
+    inter_paper_delay=2,
+    api_key=None,
+):
     query = (query or "").strip()
     if not query:
         raise ValueError("Query is required.")
 
-    api_key = get_api_key()
+    api_key = get_api_key(api_key)
     if not api_key:
         raise ValueError("Missing API key. Set API_KEY or GEMINI_API_KEY in the environment.")
 
@@ -37,7 +49,12 @@ def generate_review(query, max_results=3, output_file="outputs/sample_review_opt
 
     # 2. Initialize FAISS + metadata store
     dim = summarizer.get_embedding_dimension()
-    index = faiss.IndexFlatIP(dim) if dim is not None else None
+    if dim is not None and faiss is None:
+        logger.warning(
+            "FAISS is unavailable in the current environment. "
+            f"RAG indexing will be skipped. Import error: {_FAISS_IMPORT_ERROR}"
+        )
+    index = faiss.IndexFlatIP(dim) if (dim is not None and faiss is not None) else None
     id_to_metadata = {}
 
     if dim is None:
@@ -172,8 +189,8 @@ def generate_review(query, max_results=3, output_file="outputs/sample_review_opt
         "quota_error": summarizer.quota_error_message,
     }
 
-def run(query):
-    return generate_review(query)["review"]
+def run(query, api_key=None):
+    return generate_review(query, api_key=api_key)["review"]
 
 if __name__ == "__main__":
     run("Machine learning")
