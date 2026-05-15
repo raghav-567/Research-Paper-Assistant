@@ -1,15 +1,32 @@
-import google.generativeai as genai
+try:
+    import google.generativeai as genai
+    _GENAI_IMPORT_ERROR = None
+except Exception as e:
+    genai = None
+    _GENAI_IMPORT_ERROR = str(e)
 from src.utils import get_logger
 import numpy as np
-import faiss
 import os
 import re
 import time
+
+try:
+    import faiss
+    _FAISS_IMPORT_ERROR = None
+except Exception as e:
+    faiss = None
+    _FAISS_IMPORT_ERROR = str(e)
 
 logger = get_logger("SummarizerAgent")
 
 class SummarizerAgent:
     def __init__(self, api_key: str):
+        if genai is None:
+            raise RuntimeError(
+                "Gemini client dependency is missing. Install dependencies with "
+                "'pip install -r requirements.txt'. "
+                f"Import error: {_GENAI_IMPORT_ERROR}"
+            )
         genai.configure(api_key=api_key)
         # Use a current free-tier text model by default.
         self.model_name = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
@@ -59,6 +76,12 @@ class SummarizerAgent:
     def get_top_k_chunks(self, chunks, embeddings, query_embedding, k=10):
         if len(chunks) == 0 or embeddings.size == 0:
             return []
+        if faiss is None:
+            logger.warning(
+                "FAISS is unavailable; using first chunks instead of vector ranking. "
+                f"Import error: {_FAISS_IMPORT_ERROR}"
+            )
+            return chunks[: min(k, len(chunks))]
 
         # Build FAISS index
         dim = embeddings.shape[1]
