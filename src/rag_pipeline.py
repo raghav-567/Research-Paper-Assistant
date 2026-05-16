@@ -1,6 +1,11 @@
 import numpy as np
 from collections import defaultdict
-import faiss
+try:
+    import faiss
+    _FAISS_IMPORT_ERROR = None
+except Exception as e:
+    faiss = None
+    _FAISS_IMPORT_ERROR = str(e)
 
 class RAGPipeline:
     def __init__(self, search_agent, extraction_agent, summarizer_agent, index=None, id_to_metadata=None):
@@ -12,6 +17,12 @@ class RAGPipeline:
         self.paper_metadata = {}
 
     def build_index(self, chunks, paper_info=None):
+        if faiss is None:
+            print(
+                "⚠️ FAISS is unavailable; skipping index build. "
+                f"Import error: {_FAISS_IMPORT_ERROR}"
+            )
+            return
         texts = [chunk["text"] for chunk in chunks if chunk["text"].strip()]
         if not texts:
             print("⚠️ No valid text chunks found for embedding.")
@@ -55,6 +66,11 @@ class RAGPipeline:
             self.paper_metadata[paper_info["id"]] = paper_info
 
     def query(self, query, top_k_chunks=200, top_k_papers=3, chunks_per_paper=10):
+        if faiss is None:
+            raise RuntimeError(
+                "FAISS is unavailable in the current environment, so semantic query cannot run. "
+                f"Import error: {_FAISS_IMPORT_ERROR}"
+            )
         if self.index is None:
             raise ValueError("Index has not been built yet.")
 
