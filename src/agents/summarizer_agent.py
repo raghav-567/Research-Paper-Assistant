@@ -1,14 +1,32 @@
-try:
-    import google.generativeai as genai
-    _GENAI_IMPORT_ERROR = None
-except Exception as e:
-    genai = None
-    _GENAI_IMPORT_ERROR = str(e)
 from src.utils import get_logger
 import numpy as np
 import os
 import re
 import time
+import warnings
+
+try:
+    from google import genai
+    from google.genai import types as genai_types
+    _GENAI_IMPORT_ERROR = None
+    _GENAI_SDK = "google-genai"
+except Exception as e:
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", FutureWarning)
+            import google.generativeai as legacy_genai
+        genai = legacy_genai
+        genai_types = None
+        _GENAI_IMPORT_ERROR = None
+        _GENAI_SDK = "google-generativeai"
+    except Exception as legacy_error:
+        genai = None
+        genai_types = None
+        _GENAI_IMPORT_ERROR = (
+            f"google-genai import error: {e}; "
+            f"google-generativeai import error: {legacy_error}"
+        )
+        _GENAI_SDK = None
 
 try:
     import faiss
@@ -27,10 +45,15 @@ class SummarizerAgent:
                 "'pip install -r requirements.txt'. "
                 f"Import error: {_GENAI_IMPORT_ERROR}"
             )
-        genai.configure(api_key=api_key)
         # Use a current free-tier text model by default.
         self.model_name = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
-        self.model = genai.GenerativeModel(self.model_name)
+        self.client = None
+        self.model = None
+        if _GENAI_SDK == "google-genai":
+            self.client = genai.Client(api_key=api_key)
+        else:
+            genai.configure(api_key=api_key)
+            self.model = genai.GenerativeModel(self.model_name)
         self.embedding_model_name = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
         self.embedding_model = None
         self.embedding_error = None
@@ -169,13 +192,23 @@ class SummarizerAgent:
         for attempt in range(retry_count):
             try:
                 prompt = f"Summarize the following academic text concisely, focusing on key findings and methods:\n\n{text}"
-                response = self.model.generate_content(
-                    prompt,
-                    generation_config={
-                        "temperature": 0.3,
-                        "max_output_tokens": max_output_tokens,
-                    },
-                )
+                if _GENAI_SDK == "google-genai":
+                    response = self.client.models.generate_content(
+                        model=self.model_name,
+                        contents=prompt,
+                        config=genai_types.GenerateContentConfig(
+                            temperature=0.3,
+                            max_output_tokens=max_output_tokens,
+                        ),
+                    )
+                else:
+                    response = self.model.generate_content(
+                        prompt,
+                        generation_config={
+                            "temperature": 0.3,
+                            "max_output_tokens": max_output_tokens,
+                        },
+                    )
                 
                 summary = self._extract_response_text(response)
                 if summary:
