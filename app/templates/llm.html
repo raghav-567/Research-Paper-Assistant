@@ -1,929 +1,1363 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Research Paper Assistant</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
+
+        :root {
+            --ink: #101115;
+            --ink-soft: #5e6471;
+            --line: #d6dbe4;
+            --surface: #ffffff;
+            --surface-soft: #f3f5fa;
+            --tint: #eef3fb;
+            --accent: #5e7698;
+            --accent-blue-bg: #edf3fc;
+            --accent-blue-fg: #3f5f86;
+            --accent-blue-line: #c9d7ea;
+            --accent-green-bg: #edf7ef;
+            --accent-green-fg: #2c6944;
+            --accent-green-line: #cfe5d4;
+            --accent-amber-bg: #f8f3e8;
+            --accent-amber-fg: #7a5d2f;
+            --accent-amber-line: #eadfcb;
+            --accent-red-bg: #fbeeee;
+            --accent-red-fg: #8f3f3f;
+            --accent-red-line: #efcfcf;
+            --ok: #156f38;
+            --warn: #915f17;
+            --error: #b33131;
+            --shadow: 0 28px 56px rgba(15, 23, 42, 0.08);
+            --shadow-soft: 0 10px 22px rgba(15, 23, 42, 0.08);
+            --radius-xl: 22px;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
         }
-        
+
+        html,
         body {
-            background: linear-gradient(135deg, #f9f7ff 0%, #f0ebff 25%, #e8e0ff 50%, #e0d5ff 75%, #d8caff 100%);
-            color: #333;
-            min-height: 100vh;
-            overflow-x: hidden;
+            height: 100%;
         }
-        
-        .glass-header {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 1rem 2rem;
-            margin: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 10px 25px rgba(138, 43, 226, 0.1);
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            color: var(--ink);
+            background: linear-gradient(135deg, #121324 0%, #16152b 100%);
+            overflow: auto;
         }
-        
-        .glass-logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #8a2be2;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .glass-nav {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-        
-        .glass-nav-item {
-            color: #6b46c1;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            backdrop-filter: blur(5px);
-        }
-        
-        .glass-nav-item:hover, .glass-nav-item.active {
-            color: #8a2be2;
-            background: rgba(138, 43, 226, 0.1);
-            transform: translateY(-2px);
-        }
-        
-        .glass-status {
-            background: rgba(123, 97, 255, 0.1);
-            color: #7b61ff;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border: 1px solid rgba(123, 97, 255, 0.3);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .status-pulse {
-            width: 8px;
-            height: 8px;
-            background: #7b61ff;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.1); }
-        }
-        
-       
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1rem;
-        }
-        
-        .main-header {
-            text-align: center;
-            font-size: 3.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #8a2be2 0%, #7b68ee 50%, #9370db 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin: 2rem 0 1rem 0;
-            text-shadow: 0 0 30px rgba(138, 43, 226, 0.2);
-            letter-spacing: -0.02em;
-        }
-        
-        .tagline {
-            text-align: center;
-            color: #6b46c1;
-            font-size: 1.2rem;
-            margin-bottom: 3rem;
-            font-weight: 500;
-        }
-        
-        /* Chat Container */
-        .chat-container {
-            display: flex;
-            flex-direction: column;
-            height: 65vh;
-            max-height: 65vh;
+
+        .page {
+            height: 100dvh;
+            min-height: 100svh;
+            padding: 16px;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            grid-template-rows: minmax(0, 1fr);
             overflow: hidden;
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(138, 43, 226, 0.1);
         }
-        
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1.5rem;
+
+        .rail {
+            background: #fff;
+            border-right: 1px solid var(--line);
+            border-top-left-radius: 18px;
+            border-bottom-left-radius: 18px;
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
+            justify-content: space-between;
+            align-items: stretch;
+            padding: 14px;
+            min-height: 0;
+            overflow-y: auto;
         }
-        
-        .message {
-            display: flex;
-            max-width: 80%;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .user-message {
-            align-self: flex-end;
-        }
-        
-        .bot-message {
-            align-self: flex-start;
-        }
-        
-        .message-content {
-            padding: 1rem 1.5rem;
-            border-radius: 20px;
-            line-height: 1.5;
-            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.1);
-        }
-        
-        .user-message .message-content {
-            background: linear-gradient(135deg, #8a2be2 0%, #7b68ee 100%);
-            color: white;
-            border-bottom-right-radius: 5px;
-        }
-        
-        .bot-message .message-content {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(138, 43, 226, 0.1);
-            border-bottom-left-radius: 5px;
-            color: #333;
-        }
-        
-        .message-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+
+        .rail-mark {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            border: 1px solid #111;
+            background: #111;
+            color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 10px;
-            flex-shrink: 0;
+            box-shadow: var(--shadow-soft);
         }
-        
-        .user-message .message-icon {
-            background: linear-gradient(135deg, #8a2be2 0%, #7b68ee 100%);
-            order: 2;
-        }
-        
-        .bot-message .message-icon {
-            background: rgba(138, 43, 226, 0.1);
-            border: 1px solid rgba(138, 43, 226, 0.2);
-            color: #8a2be2;
-        }
-        
-        /* Input Area */
-        .input-container {
-            padding: 1.5rem;
-            border-top: 1px solid rgba(138, 43, 226, 0.1);
+
+        .rail-top {
             display: flex;
-            gap: 1rem;
+            flex-direction: column;
+            gap: 14px;
         }
-        
-        .input-field {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(138, 43, 226, 0.2);
-            border-radius: 15px;
-            color: #333;
-            font-size: 1rem;
-            padding: 1rem 1.5rem;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-        
-        .input-field:focus {
-            outline: none;
-            background: rgba(255, 255, 255, 0.9);
-            border-color: #8a2be2;
-            box-shadow: 0 0 20px rgba(138, 43, 226, 0.2);
-        }
-        
-        .input-field::placeholder {
-            color: rgba(107, 70, 193, 0.6);
-        }
-        
-        .send-button {
-            background: linear-gradient(135deg, #8a2be2 0%, #7b68ee 100%);
-            border: none;
-            border-radius: 15px;
-            color: white;
-            font-size: 1rem;
-            font-weight: 600;
-            padding: 1rem 2rem;
-            cursor: pointer;
-            transition: all 0.4s ease;
+
+        .rail-brand {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            box-shadow: 0 10px 25px rgba(138, 43, 226, 0.3);
+            gap: 10px;
+            padding: 0 2px;
         }
-        
-        .send-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(138, 43, 226, 0.4);
+
+        .rail-brand-label {
+            font-family: 'Fraunces', serif;
+            font-size: 0.98rem;
+            letter-spacing: 0.01em;
+            color: #161a23;
         }
-        
-        .send-button:active {
-            transform: translateY(0);
-        }
-        
-        .send-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-       
-        .paper-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(25px);
-            border: 1px solid rgba(138, 43, 226, 0.1);
-            border-radius: 15px;
-            padding: 1.5rem;
-            margin-top: 1rem;
-            box-shadow: 0 10px 25px rgba(138, 43, 226, 0.1);
-            transition: all 0.3s ease;
-        }
-        
-        .paper-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(138, 43, 226, 0.15);
-        }
-        
-        .paper-title {
-            font-size: 1.2rem;
-            color: #8a2be2;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-        
-        .paper-authors {
-            color: #6b46c1;
-            margin-bottom: 0.8rem;
-            font-style: italic;
-            font-size: 0.9rem;
-        }
-        
-        .paper-summary {
-            line-height: 1.5;
-            color: #555;
-            margin-bottom: 1rem;
-        }
-        
-        .paper-meta {
+
+        .rail-group {
             display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
+            flex-direction: column;
+            gap: 8px;
         }
-        
-        .paper-meta span {
-            background: rgba(138, 43, 226, 0.1);
-            color: #8a2be2;
-            padding: 0.3rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
+
+        .rail-field {
             display: flex;
-            align-items: center;
-            gap: 0.3rem;
-            border: 1px solid rgba(138, 43, 226, 0.2);
+            flex-direction: column;
+            gap: 7px;
+            margin-top: 4px;
         }
-        
-        
-        .progress-container {
+
+        .rail-input {
             width: 100%;
-            background-color: rgba(138, 43, 226, 0.1);
+            border: 1px solid var(--line);
             border-radius: 10px;
-            margin: 1rem 0;
-            overflow: hidden;
+            background: var(--surface-soft);
+            color: #1c2230;
+            padding: 0.56rem 0.62rem;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
         }
-        
-        .progress-bar {
-            height: 8px;
-            background: linear-gradient(90deg, #8a2be2 0%, #7b68ee 100%);
-            border-radius: 10px;
-            transition: width 0.3s ease;
+
+        .rail-input:focus {
+            outline: none;
+            border-color: #111;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
         }
-        
-       
-        .status-message {
-            padding: 1rem;
+
+        .rail-hint {
+            font-size: 0.73rem;
+            line-height: 1.35;
+            color: #697084;
+            padding: 0 2px;
+        }
+
+        .rail-keymeta {
+            font-size: 0.72rem;
+            color: #53617a;
+            background: var(--tint);
+            border: 1px solid var(--accent-blue-line);
+            border-radius: 9px;
+            padding: 0.42rem 0.52rem;
+            line-height: 1.35;
+        }
+
+        .rail-label {
+            font-size: 0.74rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            color: #7a8190;
+            text-transform: uppercase;
+            margin: 2px 2px 0;
+        }
+
+        .rail-btn {
+            width: 100%;
+            border: 1px solid var(--line);
             border-radius: 12px;
-            margin: 0.5rem 0;
+            background: #fff;
+            color: #313846;
+            padding: 0.6rem 0.72rem;
+            font-size: 0.86rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: left;
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            transition: all 0.2s ease;
+        }
+
+        .rail-btn:hover {
+            border-color: #111;
+            background: var(--tint);
+            color: #111;
+        }
+
+        .rail-btn.active {
+            border-color: #111;
+            box-shadow: var(--shadow-soft);
+            background: #f5f7fb;
+            color: #111;
+        }
+
+        .rail-btn:disabled {
+            opacity: 0.52;
+            cursor: not-allowed;
+        }
+
+        .rail-btn.action-accent {
+            background: var(--accent-blue-bg);
+            border-color: var(--accent-blue-line);
+            color: var(--accent-blue-fg);
+        }
+
+        .rail-btn.action-download {
+            background: var(--accent-green-bg);
+            border-color: var(--accent-green-line);
+            color: var(--accent-green-fg);
+        }
+
+        .rail-btn.action-clear {
+            background: var(--accent-amber-bg);
+            border-color: var(--accent-amber-line);
+            color: var(--accent-amber-fg);
+        }
+
+        .rail-btn.action-danger {
+            background: var(--accent-red-bg);
+            border-color: var(--accent-red-line);
+            color: var(--accent-red-fg);
+        }
+
+        .rail-bottom {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .workspace {
+            border-top-right-radius: 18px;
+            border-bottom-right-radius: 18px;
+            background: radial-gradient(1000px 520px at 80% 90%, #cfe8f4 0%, #edf3f8 50%, #f5f7fc 100%);
+            overflow: hidden;
+            position: relative;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .workspace::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(700px 300px at 20% 70%, rgba(194, 214, 245, 0.42) 0%, rgba(194, 214, 245, 0) 80%);
+            pointer-events: none;
+        }
+
+        .header {
+            position: relative;
+            z-index: 2;
+            border-bottom: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(8px);
+            padding: 22px 28px 14px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .title {
+            font-family: 'Fraunces', serif;
+            font-size: clamp(1.5rem, 3.5vw, 2rem);
+            line-height: 1.05;
+            letter-spacing: -0.01em;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .status-success {
-            background-color: rgba(34, 197, 94, 0.1);
-            color: #16a34a;
-            border: 1px solid rgba(34, 197, 94, 0.2);
-        }
-        
-        .status-error {
-            background-color: rgba(239, 68, 68, 0.1);
-            color: #dc2626;
-            border: 1px solid rgba(239, 68, 68, 0.2);
+            gap: 10px;
         }
 
-        .status-warning {
-            background-color: rgba(245, 158, 11, 0.12);
-            color: #b45309;
-            border: 1px solid rgba(245, 158, 11, 0.25);
+        .subtitle {
+            margin-top: 6px;
+            color: var(--ink-soft);
+            font-size: 0.94rem;
         }
-        
-    
-        .typing-indicator {
-            display: flex;
+
+        .status-chip {
+            display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            color: #6b46c1;
-            font-style: italic;
+            gap: 8px;
+            background: #111;
+            color: #fff;
+            border: 1px solid #111;
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
         }
-        .review-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(138, 43, 226, 0.2);
-}
 
-.review-title {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: #8a2be2;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.download-btn {
-    background: #6b46c1;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background 0.3s ease, transform 0.3s ease;
-}
-
-.download-btn:hover {
-    background: #8a2be2;
-    transform: translateY(-1px);
-}
-
-
-.review-card {
-    padding: 1.5rem;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(138, 43, 226, 0.15);
-    border: 1px solid rgba(138, 43, 226, 0.2);
-}
-
-.message.review-message {
-    max-width: 100%;
-}
-
-.message.review-message .message-content {
-    width: 100%;
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    padding: 0;
-}
-
-.review-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-}
-
-.review-badge {
-    background: rgba(138, 43, 226, 0.08);
-    color: #6b46c1;
-    padding: 0.35rem 0.8rem;
-    border-radius: 999px;
-    font-size: 0.82rem;
-    border: 1px solid rgba(138, 43, 226, 0.16);
-}
-
-.review-warning {
-    margin-bottom: 1rem;
-    padding: 0.9rem 1rem;
-    border-radius: 12px;
-    background: rgba(245, 158, 11, 0.12);
-    color: #9a3412;
-    border: 1px solid rgba(245, 158, 11, 0.22);
-}
-
-.review-body {
-    color: #2d2363;
-    line-height: 1.7;
-}
-
-.review-body h1,
-.review-body h2,
-.review-body h3 {
-    color: #6b46c1;
-    margin-top: 1.15rem;
-    margin-bottom: 0.6rem;
-}
-
-.review-body h1 {
-    font-size: 1.55rem;
-}
-
-.review-body h2 {
-    font-size: 1.2rem;
-}
-
-.review-body h3 {
-    font-size: 1rem;
-}
-
-.review-body p {
-    margin: 0.6rem 0;
-}
-
-.review-body ul {
-    margin: 0.6rem 0 0.9rem 1.25rem;
-}
-
-.review-body li {
-    margin-bottom: 0.35rem;
-}
-
-.review-body strong {
-    color: #2f1f74;
-}
-        
-        .typing-dots {
-            display: flex;
-            gap: 0.3rem;
+        .status-chip.status-working {
+            background: var(--accent-blue-bg);
+            color: var(--accent-blue-fg);
+            border-color: var(--accent-blue-line);
         }
-        
-        .typing-dot {
+
+        .status-chip.status-attention {
+            background: var(--accent-red-bg);
+            color: var(--accent-red-fg);
+            border-color: var(--accent-red-line);
+        }
+
+        .status-dot {
             width: 8px;
             height: 8px;
-            background: #8a2be2;
             border-radius: 50%;
-            animation: typing 1.4s infinite ease-in-out;
+            background: #fff;
+            animation: pulse 1.8s infinite;
         }
-        
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-        
-        @keyframes typing {
-            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
-            40% { transform: scale(1); opacity: 1; }
+
+        .status-chip.status-working .status-dot {
+            background: var(--accent-blue-fg);
         }
-      
-        @media (max-width: 768px) {
-            .glass-header {
-                flex-direction: column;
-                gap: 1rem;
-                text-align: center;
+
+        .status-chip.status-attention .status-dot {
+            background: var(--accent-red-fg);
+        }
+
+        @keyframes pulse {
+            0%,
+            100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.45; transform: scale(1.25); }
+        }
+
+        .main {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            min-height: 0;
+            padding: 22px;
+            display: grid;
+            place-items: center;
+        }
+
+        .panel {
+            width: min(920px, 100%);
+            height: 100%;
+            max-height: 100%;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-xl);
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: riseIn 0.35s ease-out;
+            min-height: 0;
+        }
+
+        @keyframes riseIn {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chat-scroll {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 13px;
+        }
+
+        .message {
+            display: flex;
+            max-width: 92%;
+            animation: fadeIn 0.22s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            align-self: flex-end;
+        }
+
+        .message.assistant,
+        .message.status,
+        .message.progress,
+        .message.review {
+            align-self: flex-start;
+        }
+
+        .icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1px solid var(--line);
+            background: var(--tint);
+            color: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 8px;
+            font-size: 0.84rem;
+            flex-shrink: 0;
+        }
+
+        .message.user .icon {
+            order: 2;
+            background: #111;
+            color: #fff;
+            border-color: #111;
+        }
+
+        .bubble {
+            border: 1px solid var(--line);
+            border-radius: var(--radius-lg);
+            background: #fff;
+            box-shadow: var(--shadow-soft);
+            padding: 0.9rem 1rem;
+            line-height: 1.6;
+            color: #1c2029;
+            font-size: 0.95rem;
+        }
+
+        .message.user .bubble {
+            background: #111;
+            border-color: #111;
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.assistant .bubble,
+        .message.status .bubble,
+        .message.progress .bubble,
+        .message.review .bubble {
+            border-bottom-left-radius: 4px;
+        }
+
+        .bubble.status-success {
+            border-color: rgba(21, 111, 56, 0.26);
+            background: rgba(21, 111, 56, 0.08);
+            color: var(--ok);
+        }
+
+        .bubble.status-warning {
+            border-color: rgba(145, 95, 23, 0.26);
+            background: rgba(145, 95, 23, 0.12);
+            color: var(--warn);
+        }
+
+        .bubble.status-error {
+            border-color: rgba(179, 49, 49, 0.26);
+            background: rgba(179, 49, 49, 0.08);
+            color: var(--error);
+        }
+
+        .progress-line {
+            margin-top: 10px;
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: #edf2f8;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 7px;
+            background: linear-gradient(90deg, #111 0%, #4b617f 100%);
+            border-radius: 999px;
+            transition: width 0.25s ease;
+        }
+
+        .input-row {
+            border-top: 1px solid var(--line);
+            background: #fff;
+            padding: 13px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .query-input {
+            flex: 1;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: var(--surface-soft);
+            padding: 0.85rem 0.95rem;
+            font-size: 0.94rem;
+            color: #131722;
+            transition: all 0.2s ease;
+        }
+
+        .query-input:focus {
+            outline: none;
+            border-color: #111;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
+        }
+
+        .query-input::placeholder {
+            color: #8e95a3;
+        }
+
+        .send-btn {
+            min-width: 158px;
+            border: 1px solid #111;
+            border-radius: 999px;
+            background: #111;
+            color: #fff;
+            padding: 0.82rem 1rem;
+            font-size: 0.92rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .send-btn:hover {
+            background: #fff;
+            color: #111;
+        }
+
+        .send-btn:disabled {
+            opacity: 0.58;
+            cursor: not-allowed;
+        }
+
+        .review-card {
+            border: 1px solid var(--line);
+            border-radius: var(--radius-md);
+            background: #fff;
+            box-shadow: var(--shadow-soft);
+            padding: 0.95rem;
+        }
+
+        .review-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--line);
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .review-title {
+            font-family: 'Fraunces', serif;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .review-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .chip {
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: var(--tint);
+            color: #4f617a;
+            padding: 0.32rem 0.62rem;
+            font-size: 0.78rem;
+        }
+
+        .review-warning {
+            border: 1px solid rgba(145, 95, 23, 0.28);
+            border-radius: 10px;
+            padding: 0.76rem 0.85rem;
+            background: rgba(145, 95, 23, 0.11);
+            color: var(--warn);
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .review-body {
+            color: #1f2430;
+            line-height: 1.66;
+            font-size: 0.94rem;
+        }
+
+        .review-body h1,
+        .review-body h2,
+        .review-body h3 {
+            margin: 1rem 0 0.45rem;
+            color: #111;
+            font-family: 'Fraunces', serif;
+        }
+
+        .review-body h1 { font-size: 1.34rem; }
+        .review-body h2 { font-size: 1.14rem; }
+        .review-body h3 { font-size: 1.02rem; }
+
+        .review-body p { margin: 0.48rem 0; }
+        .review-body ul { margin: 0.55rem 0 0.8rem 1.2rem; }
+        .review-body li { margin-bottom: 0.28rem; }
+
+        .history-wrap {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 14px;
+            display: grid;
+            align-content: flex-start;
+            gap: 12px;
+        }
+
+        .history-item {
+            border: 1px solid var(--line);
+            border-radius: var(--radius-md);
+            background: #fff;
+            box-shadow: var(--shadow-soft);
+            padding: 0.9rem;
+        }
+
+        .history-query {
+            font-size: 0.98rem;
+            font-weight: 600;
+            color: #151923;
+            margin-bottom: 7px;
+        }
+
+        .history-info {
+            font-size: 0.84rem;
+            color: #697080;
+            margin-bottom: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .history-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .mini-btn {
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: #fff;
+            padding: 0.36rem 0.72rem;
+            font-size: 0.8rem;
+            color: #363c49;
+            cursor: pointer;
+        }
+
+        .mini-btn:hover {
+            border-color: #111;
+            color: #111;
+        }
+
+        .mini-btn.mini-open {
+            background: var(--accent-blue-bg);
+            border-color: var(--accent-blue-line);
+            color: var(--accent-blue-fg);
+        }
+
+        .mini-btn.mini-download {
+            background: var(--accent-green-bg);
+            border-color: var(--accent-green-line);
+            color: var(--accent-green-fg);
+        }
+
+        .mini-btn.mini-remove {
+            background: var(--accent-red-bg);
+            border-color: var(--accent-red-line);
+            color: var(--accent-red-fg);
+        }
+
+        .empty {
+            border: 1px dashed var(--line);
+            border-radius: var(--radius-md);
+            background: #fff;
+            color: #6a7181;
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.92rem;
+        }
+
+        @media (max-width: 980px) {
+            .page {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+                padding: 10px;
+                height: 100dvh;
+                min-height: 100svh;
             }
-            
-            .glass-nav {
+
+            .rail {
+                border-radius: 16px 16px 0 0;
+                border-right: none;
+                border-bottom: 1px solid var(--line);
+                padding: 10px;
+                gap: 10px;
+                overflow-x: auto;
+                overflow-y: hidden;
+            }
+
+            .workspace {
+                border-radius: 0 0 16px 16px;
+            }
+
+            .header {
+                padding: 16px;
+            }
+
+            .rail-brand-label,
+            .rail-label {
+                display: none;
+            }
+
+            .rail-top,
+            .rail-bottom {
+                flex-direction: row;
+                align-items: center;
                 flex-wrap: wrap;
-                justify-content: center;
             }
-            
-            .main-header {
-                font-size: 2.5rem;
+
+            .rail-group {
+                flex-direction: row;
+                flex-wrap: wrap;
             }
-            
-            .message {
-                max-width: 90%;
+
+            .rail-mark {
+                width: 36px;
+                height: 36px;
+                border-radius: 10px;
+                flex-shrink: 0;
             }
-            
-            .input-container {
+
+            .rail-brand {
+                padding: 0;
+                flex-shrink: 0;
+            }
+
+            .rail-top,
+            .rail-bottom {
+                gap: 8px;
+            }
+
+            .rail-btn {
+                width: auto;
+                font-size: 0.78rem;
+                padding: 0.52rem 0.6rem;
+                white-space: nowrap;
+            }
+
+            .main {
+                padding: 12px;
+                min-height: 0;
+            }
+
+            .panel {
+                height: 100%;
+                border-radius: 16px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .header-top {
                 flex-direction: column;
+                align-items: flex-start;
             }
-            
-            .send-button {
+
+            .input-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .send-btn {
                 width: 100%;
-                justify-content: center;
             }
-        }
-        
-        .chat-messages::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .chat-messages::-webkit-scrollbar-track {
-            background: rgba(138, 43, 226, 0.05);
-            border-radius: 10px;
-        }
-        
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: rgba(138, 43, 226, 0.2);
-            border-radius: 10px;
-        }
-        
-        .chat-messages::-webkit-scrollbar-thumb:hover {
-            background: rgba(138, 43, 226, 0.3);
         }
     </style>
 </head>
 <body>
-    
-    <div class="glass-header">
-        <div class="glass-logo">
-            <i class="fas fa-microscope"></i> Research Assistant
-        </div>
-        <div class="glass-nav">
-            <div class="glass-nav-item active">Dashboard</div>
-            <div class="glass-nav-item">History</div>
-            <div class="glass-nav-item">Settings</div>
-            <div class="glass-nav-item">Help</div>
-        </div>
-        <div class="glass-status">
-            <div class="status-pulse"></div>
-            Online
-        </div>
-    </div>
+    <div id="root"></div>
 
-    <div class="container">
-        <h1 class="main-header">🔬 Research Paper Assistant</h1>
-        <p class="tagline">Your Intelligent Literature Companion, powered by AI and RAG.</p>
-        
-       
-        <div class="chat-container">
-            <div class="chat-messages" id="chatMessages">
-               
-                <div class="message bot-message">
-                    <div class="message-icon">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <div class="message-content">
-                        <p>Hello! I'm your research assistant. I can help you find and summarize research papers on any topic. What would you like to explore today?</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="input-container">
-                <input type="text" class="input-field" id="userInput" placeholder="Enter your research topic (e.g., quantum machine learning, transformer models)">
-                <button class="send-button" id="sendButton">
-                    <i class="fas fa-paper-plane"></i> Send
-                </button>
-            </div>
-        </div>
-    </div>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <script>
-       document.addEventListener('DOMContentLoaded', function() {
-    const chatMessages = document.getElementById('chatMessages');
-    const userInput = document.getElementById('userInput');
-    const sendButton = document.getElementById('sendButton');
-    const glassStatus = document.querySelector('.glass-status');
-    const API_BASE_URL = window.location.origin;
-    let isGenerating = false;
+    {% raw %}
+    <script type="text/babel" data-presets="react">
+        const { useEffect, useMemo, useRef, useState } = React;
+        const API_BASE_URL = window.location.origin;
+        const HISTORY_KEY = 'research_assistant_history_v1';
 
-    function escapeHtml(value) {
-        return String(value)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
-    }
-
-    function formatInline(text) {
-        let escaped = escapeHtml(text);
-        escaped = escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-        escaped = escaped.replace(/`(.+?)`/g, '<code>$1</code>');
-        return escaped;
-    }
-
-    function renderMarkdown(markdown) {
-        const lines = String(markdown || '').split('\n');
-        const html = [];
-        let inList = false;
-
-        function closeList() {
-            if (inList) {
-                html.push('</ul>');
-                inList = false;
-            }
+        function uid() {
+            return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
         }
 
-        for (const rawLine of lines) {
-            const line = rawLine.trim();
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/\"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
 
-            if (!line) {
-                closeList();
-                continue;
-            }
+        function formatInline(text) {
+            let escaped = escapeHtml(text);
+            escaped = escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            escaped = escaped.replace(/`(.+?)`/g, '<code>$1</code>');
+            return escaped;
+        }
 
-            if (line.startsWith('### ')) {
-                closeList();
-                html.push(`<h3>${formatInline(line.slice(4))}</h3>`);
-                continue;
-            }
+        function renderMarkdown(markdown) {
+            const lines = String(markdown || '').split('\n');
+            const html = [];
+            let inList = false;
 
-            if (line.startsWith('## ')) {
-                closeList();
-                html.push(`<h2>${formatInline(line.slice(3))}</h2>`);
-                continue;
-            }
-
-            if (line.startsWith('# ')) {
-                closeList();
-                html.push(`<h1>${formatInline(line.slice(2))}</h1>`);
-                continue;
-            }
-
-            if (line.startsWith('- ') || line.startsWith('* ')) {
-                if (!inList) {
-                    html.push('<ul>');
-                    inList = true;
+            function closeList() {
+                if (inList) {
+                    html.push('</ul>');
+                    inList = false;
                 }
-                html.push(`<li>${formatInline(line.slice(2))}</li>`);
-                continue;
+            }
+
+            for (const rawLine of lines) {
+                const line = rawLine.trim();
+
+                if (!line) {
+                    closeList();
+                    continue;
+                }
+
+                if (line.startsWith('### ')) {
+                    closeList();
+                    html.push('<h3>' + formatInline(line.slice(4)) + '</h3>');
+                    continue;
+                }
+
+                if (line.startsWith('## ')) {
+                    closeList();
+                    html.push('<h2>' + formatInline(line.slice(3)) + '</h2>');
+                    continue;
+                }
+
+                if (line.startsWith('# ')) {
+                    closeList();
+                    html.push('<h1>' + formatInline(line.slice(2)) + '</h1>');
+                    continue;
+                }
+
+                if (line.startsWith('- ') || line.startsWith('* ')) {
+                    if (!inList) {
+                        html.push('<ul>');
+                        inList = true;
+                    }
+                    html.push('<li>' + formatInline(line.slice(2)) + '</li>');
+                    continue;
+                }
+
+                closeList();
+                html.push('<p>' + formatInline(line) + '</p>');
             }
 
             closeList();
-            html.push(`<p>${formatInline(line)}</p>`);
+            return html.join('');
         }
 
-        closeList();
-        return html.join('');
-    }
-
-    function setAppStatus(label, busy = false) {
-        if (!glassStatus) return;
-        const pulse = '<div class="status-pulse"></div>';
-        glassStatus.innerHTML = `${pulse}${escapeHtml(label)}`;
-        glassStatus.style.opacity = busy ? '0.85' : '1';
-    }
-
-    function addMessage(content, isUser = false, options = {}) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'} ${options.variant || ''}`.trim();
-
-        const iconDiv = document.createElement('div');
-        iconDiv.className = 'message-icon';
-        iconDiv.innerHTML = isUser ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
-
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'message-content';
-
-        if (typeof content === 'string') {
-            contentDiv.innerHTML = `<p>${escapeHtml(content)}</p>`;
-        } else {
-            contentDiv.appendChild(content);
+        function downloadReviewFile(query, timestamp, review) {
+            const anchor = document.createElement('a');
+            const blob = new Blob([review], { type: 'text/markdown' });
+            anchor.href = URL.createObjectURL(blob);
+            anchor.download = 'review_' + query.replace(/\s+/g, '_') + '_' + timestamp + '.md';
+            document.body.appendChild(anchor);
+            anchor.click();
+            document.body.removeChild(anchor);
+            URL.revokeObjectURL(anchor.href);
         }
 
-        if (isUser) {
-            messageDiv.appendChild(contentDiv);
-            messageDiv.appendChild(iconDiv);
-        } else {
-            messageDiv.appendChild(iconDiv);
-            messageDiv.appendChild(contentDiv);
-        }
-
-        chatMessages.appendChild(messageDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function showProgress(progress, status) {
-        hideProgress();
-        const progressDiv = document.createElement('div');
-        progressDiv.className = 'message bot-message';
-        progressDiv.id = 'progressIndicator';
-
-        const iconDiv = document.createElement('div');
-        iconDiv.className = 'message-icon';
-        iconDiv.innerHTML = '<i class="fas fa-robot"></i>';
-
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'message-content';
-        contentDiv.innerHTML = `
-            <div class="progress-status" style="margin-bottom: 0.5rem;">${escapeHtml(status)}</div>
-            <div class="progress-container">
-                <div class="progress-bar" style="width: ${progress}%"></div>
-            </div>
-        `;
-
-        progressDiv.appendChild(iconDiv);
-        progressDiv.appendChild(contentDiv);
-        chatMessages.appendChild(progressDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function updateProgress(progress, status) {
-        const progressIndicator = document.getElementById('progressIndicator');
-        if (!progressIndicator) return;
-
-        const progressBar = progressIndicator.querySelector('.progress-bar');
-        const statusText = progressIndicator.querySelector('.progress-status');
-
-        if (progressBar) progressBar.style.width = `${progress}%`;
-        if (statusText) statusText.textContent = status;
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function hideProgress() {
-        const progress = document.getElementById('progressIndicator');
-        if (progress) {
-            progress.remove();
-        }
-    }
-
-    function showStatus(message, type = 'success') {
-        const iconMap = {
-            success: '<i class="fas fa-check-circle"></i>',
-            error: '<i class="fas fa-exclamation-circle"></i>',
-            warning: '<i class="fas fa-triangle-exclamation"></i>',
-        };
-
-        const statusDiv = document.createElement('div');
-        statusDiv.className = 'message bot-message';
-
-        const iconDiv = document.createElement('div');
-        iconDiv.className = 'message-icon';
-        iconDiv.innerHTML = iconMap[type] || iconMap.success;
-
-        const contentDiv = document.createElement('div');
-        contentDiv.className = `message-content status-message status-${type}`;
-        contentDiv.innerHTML = `<p>${escapeHtml(message)}</p>`;
-
-        statusDiv.appendChild(iconDiv);
-        statusDiv.appendChild(contentDiv);
-        chatMessages.appendChild(statusDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function generateReviewCard(review, query, timestamp, data) {
-        const reviewCard = document.createElement('div');
-        reviewCard.className = 'review-card';
-
-        const downloadReview = () => {
-            const element = document.createElement('a');
-            const file = new Blob([review], {type: 'text/markdown'});
-            element.href = URL.createObjectURL(file);
-            element.download = `review_${query.replace(/\s+/g, '_')}_${timestamp}.md`;
-            document.body.appendChild(element);
-            element.click();
-            document.body.removeChild(element);
-            URL.revokeObjectURL(element.href);
-        };
-
-        const outputLabel = data.output_file ? data.output_file.replace(/^outputs\//, '') : 'review.md';
-        const warningHtml = data.used_fallback_summary
-            ? `<div class="review-warning"><strong>Fallback summaries used.</strong> Gemini quota is unavailable, so the review uses local extractive summaries for this run.</div>`
-            : '';
-
-        reviewCard.innerHTML = `
-            <div class="review-header">
-                <div class="review-title">
-                    <i class="fas fa-file-alt"></i> Generated Literature Review
-                </div>
-                <button class="download-btn" type="button">
-                    <i class="fas fa-download"></i> Download
-                </button>
-            </div>
-            <div class="review-meta">
-                <span class="review-badge"><i class="fas fa-book-open"></i> ${escapeHtml(String(data.papers_count || 0))} papers</span>
-                <span class="review-badge"><i class="fas fa-clock"></i> ${escapeHtml(timestamp || 'Generated')}</span>
-                <span class="review-badge"><i class="fas fa-folder-open"></i> ${escapeHtml(outputLabel)}</span>
-            </div>
-            ${warningHtml}
-            <div class="review-body">${renderMarkdown(review)}</div>
-        `;
-
-        const downloadBtn = reviewCard.querySelector('.download-btn');
-        if (downloadBtn) {
-            downloadBtn.addEventListener('click', downloadReview);
-        }
-
-        return reviewCard;
-    }
-
-    async function handleUserInput() {
-        if (isGenerating) {
-            return;
-        }
-
-        const query = userInput.value.trim();
-        if (!query) {
-            showStatus('Please enter a research query to generate a literature review.', 'error');
-            return;
-        }
-
-        isGenerating = true;
-        sendButton.disabled = true;
-        userInput.disabled = true;
-        setAppStatus('Working', true);
-        addMessage(query, true);
-        userInput.value = '';
-
-        try {
-            showProgress(12, 'Initializing research pipeline...');
-            updateProgress(26, `Searching arXiv for "${query}"...`);
-
-            const response = await fetch(`${API_BASE_URL}/generate-review`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ query })
-            });
-
-            let data = {};
+        function loadHistory() {
             try {
-                data = await response.json();
-            } catch (parseError) {
-                data = {};
+                const raw = localStorage.getItem(HISTORY_KEY);
+                if (!raw) return [];
+                const parsed = JSON.parse(raw);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch {
+                return [];
             }
-
-            if (!response.ok) {
-                throw new Error(data.error || `Server error: ${response.status}`);
-            }
-
-            if (data.error) {
-                throw new Error(data.error);
-            }
-
-            updateProgress(88, 'Formatting literature review...');
-            const reviewContainer = generateReviewCard(data.review, query, data.timestamp, data);
-
-            hideProgress();
-            if (data.used_fallback_summary) {
-                showStatus('Review generated with fallback summaries because Gemini quota is unavailable.', 'warning');
-            } else {
-                showStatus('Literature review generated successfully.', 'success');
-            }
-
-            addMessage(reviewContainer, false, { variant: 'review-message' });
-            setAppStatus('Online', false);
-        } catch (error) {
-            hideProgress();
-            showStatus(error.message || 'Something went wrong while generating the review.', 'error');
-            setAppStatus('Attention', false);
-            console.error('Generation error:', error);
-        } finally {
-            isGenerating = false;
-            sendButton.disabled = false;
-            userInput.disabled = false;
-            userInput.focus();
         }
-    }
 
-    sendButton.addEventListener('click', handleUserInput);
-
-    userInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !isGenerating) {
-            e.preventDefault();
-            handleUserInput();
+        function saveHistory(items) {
+            localStorage.setItem(HISTORY_KEY, JSON.stringify(items));
         }
-    });
 
-    document.querySelectorAll('.glass-nav-item').forEach(item => {
-        item.addEventListener('click', function() {
-            document.querySelectorAll('.glass-nav-item').forEach(i => i.classList.remove('active'));
-            this.classList.add('active');
-        });
-    });
-});
+        function ReviewCard({ reviewData, onDownload }) {
+            const warning = reviewData.used_fallback_summary;
+            const html = useMemo(() => renderMarkdown(reviewData.review), [reviewData.review]);
+            return (
+                <div className="review-card">
+                    <div className="review-top">
+                        <div className="review-title"><i className="fas fa-file-alt" /> Generated Literature Review</div>
+                        <button className="mini-btn" onClick={onDownload}><i className="fas fa-download" /> Download</button>
+                    </div>
+                    <div className="review-meta">
+                        <span className="chip"><i className="fas fa-book-open" /> {reviewData.papers_count} papers</span>
+                        <span className="chip"><i className="fas fa-clock" /> {reviewData.timestamp || 'Generated'}</span>
+                        <span className="chip"><i className="fas fa-folder-open" /> {(reviewData.output_file || 'review.md').replace(/^outputs\//, '')}</span>
+                    </div>
+                    {warning ? <div className="review-warning"><strong>Fallback summaries used.</strong> Gemini quota was unavailable for this run.</div> : null}
+                    <div className="review-body" dangerouslySetInnerHTML={{ __html: html }} />
+                </div>
+            );
+        }
+
+        function App() {
+            const [tab, setTab] = useState('generate');
+            const [query, setQuery] = useState('');
+            const [busy, setBusy] = useState(false);
+            const [keyBusy, setKeyBusy] = useState(false);
+            const [statusLabel, setStatusLabel] = useState('Online');
+            const [apiKeyInput, setApiKeyInput] = useState('');
+            const [apiKeyMeta, setApiKeyMeta] = useState({ configured: false, source: 'none', masked_key: '' });
+            const [history, setHistory] = useState(() => loadHistory());
+            const [chat, setChat] = useState([
+                {
+                    id: uid(),
+                    role: 'assistant',
+                    text: 'Hello. Enter a research topic and I will search, summarize, and synthesize a complete literature review.'
+                }
+            ]);
+            const scrollRef = useRef(null);
+
+            useEffect(() => {
+                if (scrollRef.current) {
+                    scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+                }
+            }, [chat]);
+
+            useEffect(() => {
+                saveHistory(history);
+            }, [history]);
+
+            useEffect(() => {
+                refreshApiKeyStatus();
+            }, []);
+
+            function pushMessage(item) {
+                setChat(prev => [...prev, item]);
+            }
+
+            function replaceOrAddProgress(label, value) {
+                setChat(prev => {
+                    const idx = prev.findIndex(x => x.role === 'progress');
+                    if (idx === -1) {
+                        return [...prev, { id: uid(), role: 'progress', progress: { label, value } }];
+                    }
+                    const next = [...prev];
+                    next[idx] = { ...next[idx], progress: { label, value } };
+                    return next;
+                });
+            }
+
+            function clearProgress() {
+                setChat(prev => prev.filter(x => x.role !== 'progress'));
+            }
+
+            async function refreshApiKeyStatus() {
+                try {
+                    const response = await fetch(API_BASE_URL + '/api-key/status', {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' },
+                    });
+                    if (!response.ok) return;
+                    const data = await response.json();
+                    setApiKeyMeta({
+                        configured: Boolean(data.configured),
+                        source: data.source || 'none',
+                        masked_key: data.masked_key || '',
+                    });
+                } catch {
+                    // no-op for UI status refresh failures
+                }
+            }
+
+            async function saveApiKey() {
+                const key = apiKeyInput.trim();
+                if (!key || keyBusy) {
+                    return;
+                }
+
+                setKeyBusy(true);
+                try {
+                    const response = await fetch(API_BASE_URL + '/api-key', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ api_key: key }),
+                    });
+                    const data = await response.json().catch(() => ({}));
+                    if (!response.ok) {
+                        throw new Error(data.error || 'Failed to save Gemini API key.');
+                    }
+                    setApiKeyInput('');
+                    await refreshApiKeyStatus();
+                    pushMessage({
+                        id: uid(),
+                        role: 'status',
+                        statusType: 'success',
+                        text: data.message || 'Gemini API key saved for this session.',
+                    });
+                    setStatusLabel('Online');
+                } catch (err) {
+                    pushMessage({
+                        id: uid(),
+                        role: 'status',
+                        statusType: 'error',
+                        text: (err && err.message) || 'Unable to save Gemini API key.',
+                    });
+                    setStatusLabel('Attention');
+                } finally {
+                    setKeyBusy(false);
+                }
+            }
+
+            async function clearApiKeySetting() {
+                if (keyBusy) return;
+                setKeyBusy(true);
+                try {
+                    const response = await fetch(API_BASE_URL + '/api-key', { method: 'DELETE' });
+                    const data = await response.json().catch(() => ({}));
+                    if (!response.ok) {
+                        throw new Error(data.error || 'Failed to clear Gemini API key.');
+                    }
+                    await refreshApiKeyStatus();
+                    pushMessage({
+                        id: uid(),
+                        role: 'status',
+                        statusType: 'warning',
+                        text: data.message || 'Session API key cleared.',
+                    });
+                    setStatusLabel('Online');
+                } catch (err) {
+                    pushMessage({
+                        id: uid(),
+                        role: 'status',
+                        statusType: 'error',
+                        text: (err && err.message) || 'Unable to clear Gemini API key.',
+                    });
+                    setStatusLabel('Attention');
+                } finally {
+                    setKeyBusy(false);
+                }
+            }
+
+            async function handleGenerate() {
+                const trimmed = query.trim();
+                if (!trimmed || busy) return;
+
+                setBusy(true);
+                setStatusLabel('Working');
+                pushMessage({ id: uid(), role: 'user', text: trimmed });
+                setQuery('');
+
+                try {
+                    replaceOrAddProgress('Initializing research pipeline...', 14);
+                    replaceOrAddProgress('Searching arXiv and analyzing papers...', 35);
+
+                    const response = await fetch(API_BASE_URL + '/generate-review', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ query: trimmed })
+                    });
+
+                    let data = {};
+                    try {
+                        data = await response.json();
+                    } catch {
+                        data = {};
+                    }
+
+                    if (!response.ok || data.error) {
+                        throw new Error(data.error || ('Server error: ' + response.status));
+                    }
+
+                    replaceOrAddProgress('Formatting final literature review...', 90);
+
+                    const reviewPayload = {
+                        query: trimmed,
+                        review: String(data.review || ''),
+                        timestamp: String(data.timestamp || ''),
+                        papers_count: Number(data.papers_count || 0),
+                        output_file: data.output_file,
+                        used_fallback_summary: Boolean(data.used_fallback_summary)
+                    };
+
+                    clearProgress();
+
+                    pushMessage({
+                        id: uid(),
+                        role: 'status',
+                        text: reviewPayload.used_fallback_summary
+                            ? 'Review generated with fallback summaries because Gemini quota is unavailable.'
+                            : 'Literature review generated successfully.',
+                        statusType: reviewPayload.used_fallback_summary ? 'warning' : 'success'
+                    });
+
+                    pushMessage({ id: uid(), role: 'review', review: reviewPayload });
+
+                    setHistory(prev => [
+                        { id: uid(), createdAt: new Date().toISOString(), ...reviewPayload },
+                        ...prev
+                    ].slice(0, 30));
+
+                    setStatusLabel('Online');
+                } catch (err) {
+                    clearProgress();
+                    pushMessage({
+                        id: uid(),
+                        role: 'status',
+                        statusType: 'error',
+                        text: (err && err.message) || 'Something went wrong while generating the review.'
+                    });
+                    setStatusLabel('Attention');
+                } finally {
+                    setBusy(false);
+                }
+            }
+
+            function clearChat() {
+                setChat([
+                    {
+                        id: uid(),
+                        role: 'assistant',
+                        text: 'Chat cleared. Enter a new topic when you are ready.'
+                    }
+                ]);
+                setStatusLabel('Online');
+            }
+
+            function clearHistory() {
+                setHistory([]);
+            }
+
+            function openHistoryInChat(item) {
+                setTab('generate');
+                setChat(prev => [
+                    ...prev,
+                    { id: uid(), role: 'user', text: item.query },
+                    { id: uid(), role: 'review', review: item }
+                ]);
+            }
+
+            function removeHistory(id) {
+                setHistory(prev => prev.filter(x => x.id !== id));
+            }
+
+            const lastReview = useMemo(() => {
+                for (let i = chat.length - 1; i >= 0; i -= 1) {
+                    if (chat[i].role === 'review' && chat[i].review) return chat[i].review;
+                }
+                return null;
+            }, [chat]);
+
+            const statusClass = statusLabel === 'Working'
+                ? 'status-working'
+                : (statusLabel === 'Attention' ? 'status-attention' : 'status-online');
+
+            return (
+                <div className="page">
+                    <aside className="rail">
+                        <div className="rail-top">
+                            <div className="rail-brand">
+                                <div className="rail-mark">
+                                    <i className="fas fa-microscope" />
+                                </div>
+                                <div className="rail-brand-label">Controls</div>
+                            </div>
+
+                            <div className="rail-group">
+                                <div className="rail-label">Navigate</div>
+                                <button className={"rail-btn " + (tab === 'generate' ? 'active' : '')} onClick={() => setTab('generate')}>
+                                    <i className="fas fa-wand-magic-sparkles" /> Generate
+                                </button>
+                                <button className={"rail-btn " + (tab === 'history' ? 'active' : '')} onClick={() => setTab('history')}>
+                                    <i className="fas fa-clock-rotate-left" /> History
+                                </button>
+                            </div>
+
+                            <div className="rail-group">
+                                <div className="rail-label">Quick Actions</div>
+                                <button className="rail-btn action-accent" onClick={() => { setTab('generate'); setQuery('retrieval augmented generation for healthcare'); }}>
+                                    <i className="fas fa-lightbulb" /> Use Example Topic
+                                </button>
+                                <button className="rail-btn action-download" disabled={!lastReview} onClick={() => {
+                                    if (lastReview) {
+                                        downloadReviewFile(lastReview.query, lastReview.timestamp, lastReview.review);
+                                    }
+                                }}>
+                                    <i className="fas fa-download" /> Download Last Review
+                                </button>
+                            </div>
+
+                            <div className="rail-group">
+                                <div className="rail-label">Gemini API Key</div>
+                                <div className="rail-field">
+                                    <input
+                                        className="rail-input"
+                                        type="password"
+                                        value={apiKeyInput}
+                                        onChange={(e) => setApiKeyInput(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                saveApiKey();
+                                            }
+                                        }}
+                                        placeholder="Paste Gemini API key"
+                                        autoComplete="off"
+                                    />
+                                    <button className="rail-btn action-accent" onClick={saveApiKey} disabled={keyBusy || !apiKeyInput.trim()}>
+                                        <i className="fas fa-key" /> {keyBusy ? 'Saving...' : 'Save Key'}
+                                    </button>
+                                    <button className="rail-btn action-clear" onClick={clearApiKeySetting} disabled={keyBusy || apiKeyMeta.source !== 'session'}>
+                                        <i className="fas fa-ban" /> Clear Session Key
+                                    </button>
+                                </div>
+                               
+                                <div className="rail-hint">Your key is stored in this browser session only unless an environment key is configured on the server.</div>
+                            </div>
+                        </div>
+
+                        <div className="rail-bottom">
+                            <button className="rail-btn action-clear" onClick={clearChat}>
+                                <i className="fas fa-eraser" /> Clear Chat
+                            </button>
+                            <button className="rail-btn action-danger" onClick={clearHistory} disabled={history.length === 0}>
+                                <i className="fas fa-trash" /> Clear History
+                            </button>
+                        </div>
+                    </aside>
+
+                    <main className="workspace">
+                        <header className="header">
+                            <div className="header-top">
+                                <div>
+                                    <h1 className="title"><i className="fas fa-microscope" /> Research Synthesis</h1>
+                                    <p className="subtitle">Premium black and white interface with purposeful controls only.</p>
+                                </div>
+                                <div className={"status-chip " + statusClass}><span className="status-dot" /> {statusLabel}</div>
+                            </div>
+                        </header>
+
+                        <section className="main">
+                            <div className="panel">
+                                {tab === 'generate' ? (
+                                    <>
+                                        <div className="chat-scroll" ref={scrollRef}>
+                                            {chat.map(item => {
+                                                if (item.role === 'review' && item.review) {
+                                                    return (
+                                                        <div className="message review" key={item.id}>
+                                                            <div className="icon"><i className="fas fa-robot" /></div>
+                                                            <div className="bubble" style={{ width: '100%', padding: 0, border: 'none', background: 'transparent', boxShadow: 'none' }}>
+                                                                <ReviewCard
+                                                                    reviewData={item.review}
+                                                                    onDownload={() => downloadReviewFile(item.review.query, item.review.timestamp, item.review.review)}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                }
+
+                                                if (item.role === 'progress' && item.progress) {
+                                                    return (
+                                                        <div className="message progress" key={item.id}>
+                                                            <div className="icon"><i className="fas fa-robot" /></div>
+                                                            <div className="bubble">
+                                                                <p>{item.progress.label}</p>
+                                                                <div className="progress-line">
+                                                                    <div className="progress-fill" style={{ width: item.progress.value + '%' }} />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                }
+
+                                                const bubbleClass = item.role === 'status' ? 'bubble status-' + (item.statusType || 'success') : 'bubble';
+                                                const icon = item.role === 'user' ? 'fa-user' : (item.role === 'status' ? 'fa-circle-info' : 'fa-robot');
+
+                                                return (
+                                                    <div className={"message " + item.role} key={item.id}>
+                                                        <div className="icon"><i className={"fas " + icon} /></div>
+                                                        <div className={bubbleClass}><p>{item.text}</p></div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+
+                                        <div className="input-row">
+                                            <input
+                                                className="query-input"
+                                                value={query}
+                                                onChange={(e) => setQuery(e.target.value)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' && !busy) {
+                                                        e.preventDefault();
+                                                        handleGenerate();
+                                                    }
+                                                }}
+                                                placeholder="Enter your research topic"
+                                                disabled={busy}
+                                            />
+                                            <button className="send-btn" onClick={handleGenerate} disabled={busy || !query.trim()}>
+                                                <i className="fas fa-paper-plane" /> {busy ? 'Generating...' : 'Generate Review'}
+                                            </button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="history-wrap">
+                                        {history.length === 0 ? (
+                                            <div className="empty">No review history yet. Generate a review to see it here.</div>
+                                        ) : (
+                                            history.map(item => (
+                                                <div className="history-item" key={item.id}>
+                                                    <div className="history-query">{item.query}</div>
+                                                    <div className="history-info">
+                                                        <span><i className="fas fa-clock" /> {item.timestamp || 'Generated'}</span>
+                                                        <span><i className="fas fa-book-open" /> {item.papers_count} papers</span>
+                                                        <span><i className="fas fa-folder-open" /> {(item.output_file || 'review.md').replace(/^outputs\//, '')}</span>
+                                                    </div>
+                                                    <div className="history-actions">
+                                                        <button className="mini-btn mini-open" onClick={() => openHistoryInChat(item)}>Open in Chat</button>
+                                                        <button className="mini-btn mini-download" onClick={() => downloadReviewFile(item.query, item.timestamp, item.review)}>Download</button>
+                                                        <button className="mini-btn mini-remove" onClick={() => removeHistory(item.id)}>Remove</button>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </section>
+                    </main>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
+    {% endraw %}
 </body>
 </html>
