@@ -6,4 +6,13 @@ __pycache__
 outputs/
 pdfs/
 *.pdf
+.flask_session/
+*.parsed.json
+# Ignore generated review markdown, but keep project docs tracked.
 *.md
+!readme.md
+!CLAUDE.md
+
+# Vercel static build output + local CLI state
+public/
+.vercel/

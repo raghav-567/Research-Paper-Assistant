@@ -1,0 +1,17 @@
+# Only the static demo (app/templates/llm.html + seed-data.js) is needed for
+# the Vercel build. Exclude the Python backend and generated artifacts.
+.venv
+__pycache__
+*.pyc
+*.pyo
+src
+pdfs
+outputs
+.flask_session
+*.parsed.json
+Testing
+conftest.py
+pytest.ini
+requirements.txt
+.env
+.env.example
