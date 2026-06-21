@@ -173,6 +173,39 @@ python app/app.py
 
 Then open your browser to `http://localhost:5001`
 
+### Deploy the frontend to Vercel (static demo)
+
+The Python backend can't run on Vercel (long-running jobs, >250 MB ML deps, no
+persistent filesystem), so only the **frontend** is deployed there — as a static
+demo backed by **pre-generated seed reviews** instead of a live backend.
+
+How it works:
+
+- `seed-data.js` injects `window.SEED_REVIEWS`. When present, `llm.html` runs in
+  **demo mode**: it serves the seed reviews (matched to the query) and never
+  calls the backend. In the live Flask app, `/seed-data.js` returns empty, so
+  the same template stays in normal backend mode.
+- `vercel.json` builds the static site: it strips the Jinja `{% raw %}` markers
+  from `app/templates/llm.html` into `public/index.html` and copies
+  `seed-data.js` alongside it. `outputDirectory` is `public/`.
+
+Deploy:
+
+```bash
+# from the repo root, with the Vercel CLI
+vercel        # preview
+vercel --prod # production
+```
+
+To refresh the seed data, regenerate reviews into `outputs/` and rebuild
+`seed-data.js` from them (one entry per topic: `query`, `review`, `papers_count`,
+`timestamp`, `keywords`).
+
+For full live generation, deploy the backend to a host that allows long-running
+processes and large images (Cloud Run, Render, Railway, Fly.io, or HF Spaces),
+then point the frontend's `API_BASE_URL` at it and add that origin to
+`ALLOWED_ORIGINS`.
+
 ---
 
 ## 📁 Project Structure
