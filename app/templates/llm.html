@@ -1117,7 +1117,7 @@
                     id: uid(),
                     role: 'assistant',
                     text: DEMO_MODE
-                        ? 'Demo mode. Pick an example topic below to see a pre-generated literature review (no backend required).'
+                        ? 'Demo mode. Pick an example topic below to see a pre-generated literature review .'
                         : 'Hello. Enter a research topic and I will search, summarize, and synthesize a complete literature review.'
                 }
             ]);
@@ -1466,7 +1466,7 @@
                                     <i className="fas fa-circle-check" />
                                     <span>Sample data · no API key needed</span>
                                 </div>
-                                <div className="rail-hint">Static demo with pre-generated reviews. Deploy the backend for live generation.</div>
+                                <div className="rail-hint">Static demo with pre-generated reviews.</div>
                             </div>
                             ) : (
                             <div className="rail-group">
@@ -1537,7 +1537,7 @@
                                 <div>
                                     <h1 className="title"><i className="fas fa-microscope" /> Research Synthesis</h1>
                                     <p className="subtitle">{DEMO_MODE
-                                        ? 'Demo mode — pre-generated sample reviews, no backend required.'
+                                        ? 'Demo mode — pre-generated sample reviews'
                                         : 'Search arXiv, summarize each paper, and synthesize a cited literature review.'}</p>
                                 </div>
                                 <div className={"status-chip " + statusClass}><span className="status-dot" /> {statusLabel}</div>
