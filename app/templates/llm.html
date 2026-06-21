@@ -52,7 +52,7 @@
         body {
             font-family: 'Outfit', sans-serif;
             color: var(--ink);
-            background: linear-gradient(135deg, #121324 0%, #16152b 100%);
+            background: linear-gradient(135deg, #eef1f7 0%, #e7ecf4 100%);
             overflow: auto;
         }
 
@@ -75,7 +75,7 @@
             flex-direction: column;
             justify-content: space-between;
             align-items: stretch;
-            padding: 14px;
+            padding: 22px 18px;
             min-height: 0;
             overflow-y: auto;
         }
@@ -84,8 +84,7 @@
             width: 44px;
             height: 44px;
             border-radius: 14px;
-            border: 1px solid #111;
-            background: #111;
+            background: linear-gradient(150deg, var(--accent) 0%, var(--accent-blue-fg) 100%);
             color: #fff;
             display: flex;
             align-items: center;
@@ -96,14 +95,14 @@
         .rail-top {
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 24px;
         }
 
         .rail-brand {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 0 2px;
+            gap: 11px;
+            padding: 0 2px 4px;
         }
 
         .rail-brand-label {
@@ -116,14 +115,26 @@
         .rail-group {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 11px;
         }
 
         .rail-field {
             display: flex;
             flex-direction: column;
-            gap: 7px;
-            margin-top: 4px;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .rail-key-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .rail-key-actions .rail-btn {
+            flex: 1;
+            justify-content: center;
+            text-align: center;
+            padding: 0.56rem 0.5rem;
         }
 
         .rail-input {
@@ -139,9 +150,9 @@
 
         .rail-input:focus {
             outline: none;
-            border-color: #111;
+            border-color: var(--accent-blue-fg);
             background: #fff;
-            box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
+            box-shadow: 0 0 0 3px rgba(63, 95, 134, 0.14);
         }
 
         .rail-hint {
@@ -167,7 +178,41 @@
             letter-spacing: 0.06em;
             color: #7a8190;
             text-transform: uppercase;
-            margin: 2px 2px 0;
+            margin: 0 2px 2px;
+        }
+
+        .rail-keystatus {
+            display: flex;
+            align-items: flex-start;
+            gap: 7px;
+            font-size: 0.74rem;
+            font-weight: 500;
+            border-radius: 9px;
+            padding: 0.42rem 0.55rem;
+            border: 1px solid var(--line);
+            line-height: 1.35;
+        }
+
+        .rail-keystatus span {
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .rail-keystatus.ok {
+            background: var(--accent-green-bg);
+            border-color: var(--accent-green-line);
+            color: var(--accent-green-fg);
+        }
+
+        .rail-keystatus.warn {
+            background: var(--accent-amber-bg);
+            border-color: var(--accent-amber-line);
+            color: var(--accent-amber-fg);
+        }
+
+        .rail-keystatus code {
+            font-family: ui-monospace, monospace;
+            font-size: 0.72rem;
         }
 
         .rail-btn {
@@ -176,7 +221,7 @@
             border-radius: 12px;
             background: #fff;
             color: #313846;
-            padding: 0.6rem 0.72rem;
+            padding: 0.64rem 0.78rem;
             font-size: 0.86rem;
             font-weight: 500;
             cursor: pointer;
@@ -188,16 +233,16 @@
         }
 
         .rail-btn:hover {
-            border-color: #111;
+            border-color: var(--accent-blue-line);
             background: var(--tint);
-            color: #111;
+            color: var(--accent-blue-fg);
         }
 
         .rail-btn.active {
-            border-color: #111;
+            border-color: var(--accent-blue-line);
             box-shadow: var(--shadow-soft);
-            background: #f5f7fb;
-            color: #111;
+            background: var(--accent-blue-bg);
+            color: var(--accent-blue-fg);
         }
 
         .rail-btn:disabled {
@@ -232,8 +277,10 @@
         .rail-bottom {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            margin-top: 12px;
+            gap: 10px;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--line);
         }
 
         .workspace {
@@ -478,6 +525,55 @@
             transition: width 0.25s ease;
         }
 
+        .progress-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .progress-pct {
+            font-variant-numeric: tabular-nums;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--accent-blue-fg);
+        }
+
+        .suggest-wrap {
+            margin: 2px 6px 4px;
+        }
+
+        .suggest-label {
+            font-size: 0.78rem;
+            color: var(--ink-soft);
+            margin-bottom: 8px;
+        }
+
+        .suggest-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .suggest-chip {
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: #fff;
+            color: #36405a;
+            padding: 0.44rem 0.78rem;
+            font-size: 0.82rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+
+        .suggest-chip:hover {
+            border-color: var(--accent-blue-line);
+            background: var(--tint);
+            color: var(--accent-blue-fg);
+            transform: translateY(-1px);
+        }
+
         .input-row {
             border-top: 1px solid var(--line);
             background: #fff;
@@ -500,9 +596,9 @@
 
         .query-input:focus {
             outline: none;
-            border-color: #111;
+            border-color: var(--accent-blue-fg);
             background: #fff;
-            box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
+            box-shadow: 0 0 0 3px rgba(63, 95, 134, 0.14);
         }
 
         .query-input::placeholder {
@@ -607,8 +703,33 @@
         .review-body h3 { font-size: 1.02rem; }
 
         .review-body p { margin: 0.48rem 0; }
-        .review-body ul { margin: 0.55rem 0 0.8rem 1.2rem; }
-        .review-body li { margin-bottom: 0.28rem; }
+        .review-body ul,
+        .review-body ol { margin: 0.55rem 0 0.8rem 1.25rem; }
+        .review-body li { margin-bottom: 0.32rem; }
+        .review-body em { font-style: italic; }
+
+        .review-body a {
+            color: var(--accent-blue-fg);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            text-decoration-thickness: 1px;
+            word-break: break-word;
+        }
+
+        .review-body a:hover { color: var(--ink); }
+
+        .review-body code {
+            background: var(--surface-soft);
+            border: 1px solid var(--line);
+            border-radius: 5px;
+            padding: 0.05rem 0.32rem;
+            font-size: 0.86em;
+            font-family: 'Fraunces', ui-monospace, monospace;
+        }
+
+        /* References render as a numbered list; tighten their spacing and dim
+           the trailing arXiv links so titles stay the focus. */
+        .review-body h2 + ol li { color: #2a3140; }
 
         .history-wrap {
             flex: 1;
@@ -661,8 +782,8 @@
         }
 
         .mini-btn:hover {
-            border-color: #111;
-            color: #111;
+            border-color: var(--accent-blue-line);
+            color: var(--accent-blue-fg);
         }
 
         .mini-btn.mini-open {
@@ -792,9 +913,14 @@
 <body>
     <div id="root"></div>
 
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone@7.28.5/babel.min.js"></script>
+
+    <!-- Optional seed data. Present only in the static (Vercel) demo build;
+         when it sets window.SEED_REVIEWS the app runs in backend-free demo mode.
+         In the Flask app this resolves to an empty no-op response. -->
+    <script src="seed-data.js"></script>
 
     {% raw %}
     <script type="text/babel" data-presets="react">
@@ -802,8 +928,39 @@
         const API_BASE_URL = window.location.origin;
         const HISTORY_KEY = 'research_assistant_history_v1';
 
+        // Demo mode: when seed data is injected (static build), the app serves
+        // pre-generated reviews instead of calling the backend.
+        const SEED_REVIEWS = Array.isArray(window.SEED_REVIEWS) ? window.SEED_REVIEWS : null;
+        const DEMO_MODE = !!(SEED_REVIEWS && SEED_REVIEWS.length);
+
+        const DEFAULT_TOPICS = [
+            'retrieval augmented generation for healthcare',
+            'diffusion models for protein design',
+            'mixture-of-experts scaling laws',
+        ];
+        // In demo mode, surface the topics we actually have seed data for.
+        const EXAMPLE_TOPICS = DEMO_MODE ? SEED_REVIEWS.map(s => s.query) : DEFAULT_TOPICS;
+
         function uid() {
             return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+        }
+
+        // Pick the seed review whose topic/keywords best overlap the query.
+        // Falls back to the first seed so any query still returns something.
+        function findSeedReview(query) {
+            if (!SEED_REVIEWS || !SEED_REVIEWS.length) return null;
+            const q = String(query || '').toLowerCase();
+            const qWords = q.split(/[^a-z0-9]+/).filter(w => w.length > 2);
+            let best = SEED_REVIEWS[0];
+            let bestScore = -1;
+            for (const s of SEED_REVIEWS) {
+                const hay = (s.query + ' ' + ((s.keywords || []).join(' '))).toLowerCase();
+                let score = 0;
+                for (const w of qWords) if (hay.includes(w)) score += 1;
+                if (hay.includes(q) || q.includes(String(s.query).toLowerCase())) score += 5;
+                if (score > bestScore) { bestScore = score; best = s; }
+            }
+            return best;
         }
 
         function escapeHtml(value) {
@@ -816,21 +973,36 @@
         }
 
         function formatInline(text) {
-            let escaped = escapeHtml(text);
-            escaped = escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-            escaped = escaped.replace(/`(.+?)`/g, '<code>$1</code>');
-            return escaped;
+            let s = escapeHtml(text);
+            // Bold first so its asterisks don't get caught by the italic rule.
+            s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            // Markdown links [label](url) — only allow http(s) destinations.
+            s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, label, url) => {
+                const safe = /^https?:\/\//i.test(url) ? url : '#';
+                return '<a href="' + safe + '" target="_blank" rel="noopener noreferrer">' + label + '</a>';
+            });
+            s = s.replace(/\*(?!\s)([^*]+?)\*/g, '<em>$1</em>');
+            s = s.replace(/`(.+?)`/g, '<code>$1</code>');
+            return s;
         }
 
         function renderMarkdown(markdown) {
             const lines = String(markdown || '').split('\n');
             const html = [];
-            let inList = false;
+            let listType = null; // 'ul' | 'ol' | null
 
             function closeList() {
-                if (inList) {
-                    html.push('</ul>');
-                    inList = false;
+                if (listType) {
+                    html.push('</' + listType + '>');
+                    listType = null;
+                }
+            }
+
+            function openList(type) {
+                if (listType !== type) {
+                    closeList();
+                    html.push('<' + type + '>');
+                    listType = type;
                 }
             }
 
@@ -860,11 +1032,15 @@
                     continue;
                 }
 
+                const ordered = line.match(/^(\d+)\.\s+(.*)$/);
+                if (ordered) {
+                    openList('ol');
+                    html.push('<li>' + formatInline(ordered[2]) + '</li>');
+                    continue;
+                }
+
                 if (line.startsWith('- ') || line.startsWith('* ')) {
-                    if (!inList) {
-                        html.push('<ul>');
-                        inList = true;
-                    }
+                    openList('ul');
                     html.push('<li>' + formatInline(line.slice(2)) + '</li>');
                     continue;
                 }
@@ -928,15 +1104,21 @@
             const [query, setQuery] = useState('');
             const [busy, setBusy] = useState(false);
             const [keyBusy, setKeyBusy] = useState(false);
-            const [statusLabel, setStatusLabel] = useState('Online');
+            const [statusLabel, setStatusLabel] = useState(DEMO_MODE ? 'Demo' : 'Online');
             const [apiKeyInput, setApiKeyInput] = useState('');
-            const [apiKeyMeta, setApiKeyMeta] = useState({ configured: false, source: 'none', masked_key: '' });
+            const [apiKeyMeta, setApiKeyMeta] = useState(
+                DEMO_MODE
+                    ? { configured: true, source: 'demo', masked_key: '' }
+                    : { configured: false, source: 'none', masked_key: '' }
+            );
             const [history, setHistory] = useState(() => loadHistory());
             const [chat, setChat] = useState([
                 {
                     id: uid(),
                     role: 'assistant',
-                    text: 'Hello. Enter a research topic and I will search, summarize, and synthesize a complete literature review.'
+                    text: DEMO_MODE
+                        ? 'Demo mode. Pick an example topic below to see a pre-generated literature review (no backend required).'
+                        : 'Hello. Enter a research topic and I will search, summarize, and synthesize a complete literature review.'
                 }
             ]);
             const scrollRef = useRef(null);
@@ -976,6 +1158,7 @@
             }
 
             async function refreshApiKeyStatus() {
+                if (DEMO_MODE) return; // No backend in demo mode.
                 try {
                     const response = await fetch(API_BASE_URL + '/api-key/status', {
                         method: 'GET',
@@ -1062,6 +1245,67 @@
                 }
             }
 
+            function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            async function pollJob(jobId) {
+                // Poll the job status endpoint until the review is done or fails.
+                while (true) {
+                    await sleep(1500);
+                    const response = await fetch(API_BASE_URL + '/generate-review/' + jobId, {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' },
+                    });
+
+                    let data = {};
+                    try {
+                        data = await response.json();
+                    } catch {
+                        data = {};
+                    }
+
+                    if (!response.ok) {
+                        throw new Error(data.error || ('Server error: ' + response.status));
+                    }
+
+                    if (data.progress) {
+                        replaceOrAddProgress(data.progress.label, data.progress.value);
+                    }
+
+                    if (data.status === 'done') {
+                        return data;
+                    }
+                    if (data.status === 'error') {
+                        throw new Error(data.error || 'Review generation failed.');
+                    }
+                }
+            }
+
+            async function runDemoReview(trimmed) {
+                // Simulate the pipeline stages, then resolve from seed data.
+                const steps = [
+                    ['Searching arXiv for relevant papers...', 24],
+                    ['Downloading and parsing PDFs...', 46],
+                    ['Embedding chunks and building the RAG index...', 68],
+                    ['Retrieving relevant passages and synthesizing...', 88],
+                ];
+                for (const [label, value] of steps) {
+                    replaceOrAddProgress(label, value);
+                    await sleep(600);
+                }
+                const seed = findSeedReview(trimmed) || {};
+                return {
+                    query: trimmed,
+                    review: String(seed.review || 'No demo data is available for this topic.'),
+                    timestamp: seed.timestamp || new Date().toISOString().slice(0, 10),
+                    papers_count: Number(seed.papers_count || 0),
+                    output_file: seed.output_file || 'demo_review.md',
+                    used_fallback_summary: Boolean(seed.used_fallback_summary),
+                    matched_topic: seed.query || ''
+                };
+            }
+
             async function handleGenerate() {
                 const trimmed = query.trim();
                 if (!trimmed || busy) return;
@@ -1072,47 +1316,60 @@
                 setQuery('');
 
                 try {
-                    replaceOrAddProgress('Initializing research pipeline...', 14);
-                    replaceOrAddProgress('Searching arXiv and analyzing papers...', 35);
+                    replaceOrAddProgress('Initializing research pipeline...', 8);
 
-                    const response = await fetch(API_BASE_URL + '/generate-review', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ query: trimmed })
-                    });
+                    let reviewPayload;
+                    if (DEMO_MODE) {
+                        reviewPayload = await runDemoReview(trimmed);
+                    } else {
+                        const response = await fetch(API_BASE_URL + '/generate-review', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ query: trimmed })
+                        });
 
-                    let data = {};
-                    try {
-                        data = await response.json();
-                    } catch {
-                        data = {};
+                        let startData = {};
+                        try {
+                            startData = await response.json();
+                        } catch {
+                            startData = {};
+                        }
+
+                        if (!response.ok || startData.error || !startData.job_id) {
+                            throw new Error(startData.error || ('Server error: ' + response.status));
+                        }
+
+                        const data = await pollJob(startData.job_id);
+
+                        reviewPayload = {
+                            query: trimmed,
+                            review: String(data.review || ''),
+                            timestamp: String(startData.timestamp || ''),
+                            papers_count: Number(data.papers_count || 0),
+                            output_file: data.output_file,
+                            used_fallback_summary: Boolean(data.used_fallback_summary)
+                        };
                     }
-
-                    if (!response.ok || data.error) {
-                        throw new Error(data.error || ('Server error: ' + response.status));
-                    }
-
-                    replaceOrAddProgress('Formatting final literature review...', 90);
-
-                    const reviewPayload = {
-                        query: trimmed,
-                        review: String(data.review || ''),
-                        timestamp: String(data.timestamp || ''),
-                        papers_count: Number(data.papers_count || 0),
-                        output_file: data.output_file,
-                        used_fallback_summary: Boolean(data.used_fallback_summary)
-                    };
 
                     clearProgress();
 
-                    pushMessage({
-                        id: uid(),
-                        role: 'status',
-                        text: reviewPayload.used_fallback_summary
+                    let statusText;
+                    let statusType;
+                    if (DEMO_MODE) {
+                        const related = reviewPayload.matched_topic
+                            && reviewPayload.matched_topic.toLowerCase() !== trimmed.toLowerCase();
+                        statusText = related
+                            ? ('Demo mode: showing the closest sample review ("' + reviewPayload.matched_topic + '").')
+                            : 'Loaded a pre-generated sample review (demo mode).';
+                        statusType = 'success';
+                    } else {
+                        statusText = reviewPayload.used_fallback_summary
                             ? 'Review generated with fallback summaries because Gemini quota is unavailable.'
-                            : 'Literature review generated successfully.',
-                        statusType: reviewPayload.used_fallback_summary ? 'warning' : 'success'
-                    });
+                            : 'Literature review generated successfully.';
+                        statusType = reviewPayload.used_fallback_summary ? 'warning' : 'success';
+                    }
+
+                    pushMessage({ id: uid(), role: 'status', text: statusText, statusType });
 
                     pushMessage({ id: uid(), role: 'review', review: reviewPayload });
 
@@ -1121,7 +1378,7 @@
                         ...prev
                     ].slice(0, 30));
 
-                    setStatusLabel('Online');
+                    setStatusLabel(DEMO_MODE ? 'Demo' : 'Online');
                 } catch (err) {
                     clearProgress();
                     pushMessage({
@@ -1171,6 +1428,12 @@
                 return null;
             }, [chat]);
 
+            // Compact masked key (AIza…h8UA) so a long key never overflows the rail.
+            const shortKey = useMemo(() => {
+                const k = apiKeyMeta.masked_key || '';
+                return k.length > 12 ? k.slice(0, 4) + '…' + k.slice(-4) : k;
+            }, [apiKeyMeta.masked_key]);
+
             const statusClass = statusLabel === 'Working'
                 ? 'status-working'
                 : (statusLabel === 'Attention' ? 'status-attention' : 'status-online');
@@ -1196,20 +1459,16 @@
                                 </button>
                             </div>
 
+                            {DEMO_MODE ? (
                             <div className="rail-group">
-                                <div className="rail-label">Quick Actions</div>
-                                <button className="rail-btn action-accent" onClick={() => { setTab('generate'); setQuery('retrieval augmented generation for healthcare'); }}>
-                                    <i className="fas fa-lightbulb" /> Use Example Topic
-                                </button>
-                                <button className="rail-btn action-download" disabled={!lastReview} onClick={() => {
-                                    if (lastReview) {
-                                        downloadReviewFile(lastReview.query, lastReview.timestamp, lastReview.review);
-                                    }
-                                }}>
-                                    <i className="fas fa-download" /> Download Last Review
-                                </button>
+                                <div className="rail-label">Demo Mode</div>
+                                <div className="rail-keystatus ok">
+                                    <i className="fas fa-circle-check" />
+                                    <span>Sample data · no API key needed</span>
+                                </div>
+                                <div className="rail-hint">Static demo with pre-generated reviews. Deploy the backend for live generation.</div>
                             </div>
-
+                            ) : (
                             <div className="rail-group">
                                 <div className="rail-label">Gemini API Key</div>
                                 <div className="rail-field">
@@ -1227,19 +1486,42 @@
                                         placeholder="Paste Gemini API key"
                                         autoComplete="off"
                                     />
-                                    <button className="rail-btn action-accent" onClick={saveApiKey} disabled={keyBusy || !apiKeyInput.trim()}>
-                                        <i className="fas fa-key" /> {keyBusy ? 'Saving...' : 'Save Key'}
-                                    </button>
-                                    <button className="rail-btn action-clear" onClick={clearApiKeySetting} disabled={keyBusy || apiKeyMeta.source !== 'session'}>
-                                        <i className="fas fa-ban" /> Clear Session Key
-                                    </button>
+                                    <div className="rail-key-actions">
+                                        <button className="rail-btn action-accent" onClick={saveApiKey} disabled={keyBusy || !apiKeyInput.trim()}>
+                                            <i className="fas fa-key" /> {keyBusy ? 'Saving...' : 'Save'}
+                                        </button>
+                                        <button className="rail-btn action-clear" onClick={clearApiKeySetting} disabled={keyBusy || apiKeyMeta.source !== 'session'}>
+                                            <i className="fas fa-ban" /> Clear
+                                        </button>
+                                    </div>
                                 </div>
-                               
-                                <div className="rail-hint">Your key is stored in this browser session only unless an environment key is configured on the server.</div>
+
+                                <div className={"rail-keystatus " + (apiKeyMeta.configured ? 'ok' : 'warn')}>
+                                    {apiKeyMeta.configured ? (
+                                        <>
+                                            <i className="fas fa-circle-check" />
+                                            <span>Key active · {apiKeyMeta.source}{shortKey ? ' · ' : ''}<code>{shortKey}</code></span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="fas fa-circle-exclamation" />
+                                            <span>No API key yet — add one to generate reviews.</span>
+                                        </>
+                                    )}
+                                </div>
+                                <div className="rail-hint">Stored server-side for this session only.</div>
                             </div>
+                            )}
                         </div>
 
                         <div className="rail-bottom">
+                            <button className="rail-btn action-download" disabled={!lastReview} onClick={() => {
+                                if (lastReview) {
+                                    downloadReviewFile(lastReview.query, lastReview.timestamp, lastReview.review);
+                                }
+                            }}>
+                                <i className="fas fa-download" /> Download Last Review
+                            </button>
                             <button className="rail-btn action-clear" onClick={clearChat}>
                                 <i className="fas fa-eraser" /> Clear Chat
                             </button>
@@ -1254,7 +1536,9 @@
                             <div className="header-top">
                                 <div>
                                     <h1 className="title"><i className="fas fa-microscope" /> Research Synthesis</h1>
-                                    <p className="subtitle">Premium black and white interface with purposeful controls only.</p>
+                                    <p className="subtitle">{DEMO_MODE
+                                        ? 'Demo mode — pre-generated sample reviews, no backend required.'
+                                        : 'Search arXiv, summarize each paper, and synthesize a cited literature review.'}</p>
                                 </div>
                                 <div className={"status-chip " + statusClass}><span className="status-dot" /> {statusLabel}</div>
                             </div>
@@ -1284,8 +1568,11 @@
                                                     return (
                                                         <div className="message progress" key={item.id}>
                                                             <div className="icon"><i className="fas fa-robot" /></div>
-                                                            <div className="bubble">
-                                                                <p>{item.progress.label}</p>
+                                                            <div className="bubble" style={{ minWidth: '260px' }}>
+                                                                <div className="progress-head">
+                                                                    <span>{item.progress.label}</span>
+                                                                    <span className="progress-pct">{Math.round(item.progress.value)}%</span>
+                                                                </div>
                                                                 <div className="progress-line">
                                                                     <div className="progress-fill" style={{ width: item.progress.value + '%' }} />
                                                                 </div>
@@ -1304,6 +1591,23 @@
                                                     </div>
                                                 );
                                             })}
+
+                                            {!chat.some(m => m.role === 'user') && !busy ? (
+                                                <div className="suggest-wrap">
+                                                    <div className="suggest-label">Try a topic to get started:</div>
+                                                    <div className="suggest-row">
+                                                        {EXAMPLE_TOPICS.map(topic => (
+                                                            <button
+                                                                key={topic}
+                                                                className="suggest-chip"
+                                                                onClick={() => setQuery(topic)}
+                                                            >
+                                                                {topic}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ) : null}
                                         </div>
 
                                         <div className="input-row">
